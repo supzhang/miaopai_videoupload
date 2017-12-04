@@ -40,6 +40,7 @@ class mp_thread(QThread):
         init_upload_n = 0
         while True:#init_upload_n < self.retry_times:
             init_upload = self.init_upload()
+           # print('init_upload', init_upload)
             time.sleep(0.3)
             self.statusChange(3,init_upload['msg'])
             if init_upload['init_ok'] == 0: #初始化失败，重新上初始化
@@ -253,11 +254,12 @@ class mp_thread(QThread):
     def mkfile(self):  #检查文件是否上传正确self.headers['content-type'] = 'application/octet-stream'
         self.headers['content-type'] = 'text/plain;charset=UTF-8'
         #key_not_bin = 'stream/' + self.scid + '.mp4'
-        key = base64.b64encode(self.media_key.encode(encoding='utf-8')).decode().replace('/','_')
-        fname = base64.b64encode(self.file_name.encode(encoding='utf-8')).decode().replace('/','_')
-        scid = base64.b64encode(self.scid.encode(encoding='utf-8')).decode().replace('/','_')
-        os_sdk = base64.b64encode('qiniu_web_sdk'.encode(encoding = 'utf-8')).decode().replace('/','_')
-        upload_time = base64.b64encode(str(int(time.time()*1000)).encode(encoding='utf-8')).decode().replace('/','_')
+        key = base64.urlsafe_b64encode(self.media_key.encode(encoding='utf-8')).decode()
+        fname = base64.urlsafe_b64encode(self.file_name.encode(encoding='utf-8')).decode()
+        scid = base64.urlsafe_b64encode(self.scid.encode(encoding='utf-8')).decode()
+        os_sdk = base64.urlsafe_b64encode('qiniu_web_sdk'.encode(encoding = 'utf-8')).decode()
+        upload_time = base64.urlsafe_b64encode(str(int(time.time()*1000)).encode(encoding='utf-8')).decode()
+        print(upload_time, type(upload_time))
          #上面将参数初始化，下面生成验证需要的URL
         url = 'http://upload.qbox.me/mkfile/' + str(self.file_size) + \
               '/key/' + key + \
@@ -383,7 +385,7 @@ class mp_thread(QThread):
         data = {
             'scid':self.scid,
         }
-        while t < 60:
+        while t < 80:
             t += 1
             try:
                 cover_res = self.sess.post(url_api,headers = self.headers,data = data)
@@ -505,7 +507,7 @@ class mp_thread(QThread):
             #print(res_json)
             ret = {
                 'pub_ok':1 if res_json['data']['msg']=='OK' else 0,
-                'msg':'视频发布成功！' + self.file_name if res_json['data']['msg']=='OK' else '视频发布失败！' + res_json['msg']+ self.file_name,
+                'msg':'视频发布成功！' if res_json['data']['msg']=='OK' else '视频发布失败！' + res_json['msg'] ,#+ self.file_name if res_json['data']['msg']=='OK' else '视频发布失败！' + res_json['msg']+ self.file_name,
                 'channel':res_json['data']['channel'],
             }
             self.finsig.append('视频发布成功！')
