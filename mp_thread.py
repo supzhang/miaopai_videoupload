@@ -9,7 +9,7 @@ import base64
 class mp_thread(QThread):
     txtSignal = pyqtSignal(str)
     finishSignal = pyqtSignal(list)
-    finishOkSignal = pyqtSignal()
+    finishOkSignal = pyqtSignal(int)
     statusSignal = pyqtSignal(list)
 
     def __init__(self,sess,path,info,threadno,parent=None):
@@ -99,7 +99,7 @@ class mp_thread(QThread):
                         publishNew = self.publishNew(checkVideoStatus['w'],checkVideoStatus['h'])
                         self.statusChange(1,publishNew['msg'])
                         time.sleep(1)
-                        self.finishOkSignal.emit()
+                        self.finishOkSignal.emit(20)
                         return
                     elif getCovers['getcover_ok'] == 2:
                         try:
@@ -112,7 +112,7 @@ class mp_thread(QThread):
                             publishNew = self.publishNew(checkVideoStatus['w'],checkVideoStatus['h'])
                             self.statusChange(1,publishNew['msg'])
                             time.sleep(1)
-                            self.finishOkSignal.emit()
+                            self.finishOkSignal.emit(20)
                             return
                         else:
                             pass
@@ -592,7 +592,7 @@ class loginThread(QThread):   #登陆线程，防止登陆时卡死
         self.ui.isLogin = isLogin
         self.ui.txtSignal.emit(['提示',msg])
         if isLogin == 1:
-            self.t1 = getVideothread(self.sess,self.headers)
+            self.t1 = getVideothread(self.sess,self.headers,20)
             self.t1.getListSignal.connect(self.ui.addList)
             self.t1.start()
 
@@ -614,12 +614,13 @@ class loginThread(QThread):   #登陆线程，防止登陆时卡死
 class getVideothread(QThread):
     getListSignal = pyqtSignal(dict)
     getlistDisableSignal = pyqtSignal(int)
-    def __init__(self,sess,headers):
+    def __init__(self,sess,headers,no):
         super().__init__()
         self.sess = sess
+        self.no = no
         self.headers = headers
     def run(self):
-        count = 20
+        count = self.no
         url_api = 'http://creator.miaopai.com/video/getList'
 
         data = {

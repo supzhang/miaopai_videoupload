@@ -29,8 +29,6 @@ class myui(form):
         self.btn_getlist.clicked.connect(self.getList)
         self.btn_del.clicked.connect(self.deleteVideo)
         self.btn_del_status.clicked.connect(self.del_status)
-        #self.ftitle.focusOutEvent(self.empty_log)
-        # self.ftitle.hasFocus.connect(self.empty_log)
         self.txtSignal.connect(self.messagebox)
         self.deleteSignal.connect(self.deleteVideo)
         #self.picTipSignal.connect(self.picTip)
@@ -45,6 +43,7 @@ class myui(form):
         self.btn_del.setDisabled(True)
         self.threads = []
         self.hideuser = True #用户列表初始隐藏
+        self.maxrows = 20 #视频列表最大数量
 
         self.table_status.setHorizontalHeaderLabels(['状态','标题','进度条','日志','用户名'])
         self.finishTable.setHorizontalHeaderLabels(['标题', '信息', '帐号','文件名'])
@@ -267,6 +266,7 @@ class myui(form):
                 'serial':serial_,
                 'hasad':hasad_,
             }
+
             shorttitle = ftitle_ if len(ftitle_) < 15 else ftitle_[:15] + '...'
             item_txt = [status,shorttitle,'',current_status,self.phone]
             col = 0
@@ -277,6 +277,7 @@ class myui(form):
                     if status == '失败':
                         self.table_status.item(threadno, 0).setBackground(self.status_color['失败'])
                 col += 1
+            self.table_status.item(threadno, 1).setToolTip(ftitle_)
             if titleok == False:
                 return
             self.t = mp_thread(self.sess, path, info, threadno)
@@ -351,12 +352,12 @@ class myui(form):
             return 0
         else:
             return 1
-    def getList(self): #获取视频列表
+    def getList(self,no): #获取视频列表
             
         try:
             time.sleep(1)
             self.getlist_disable(1)
-            self.t2 = getVideothread(self.sess,self.headers)
+            self.t2 = getVideothread(self.sess,self.headers,no)
 
             self.t2.getListSignal.connect(self.addList)
             self.t2.getlistDisableSignal.connect(self.getlist_disable)
@@ -365,15 +366,16 @@ class myui(form):
             print(e)
     def addList(self,json):
         lineheight = 80
-        maxrows = 20
         if json['code'] == 200:
             self.video_no = json['data']['total']
             self.allVideosNo.setText('本帐号共有视频数：' + str(self.video_no))
             video_list = json['data']['list']
             self.btn_del.setDisabled(False)
-
-            rows = maxrows if maxrows <= len(video_list) else len(video_list)
-            self.okTable.setRowCount(rows)
+            self.maxrows = self.maxrows if self.maxrows <= len(video_list) else len(video_list)
+            # if len(video_list) == 1:
+            #     self.okTable.insertRow(1)
+            # else:
+            self.okTable.setRowCount(self.maxrows)
             time.sleep(0.2)
             newRow = 0
             for v in video_list:
@@ -385,7 +387,7 @@ class myui(form):
                 read = v['vcnt']
                 img = v['cover']
                 video_url = v['video_url']
-                video_width  = v['weight']
+                video_width = v['weight']
                 video_height = v['height']
                 txt = title + '\n' + createtime + '\n' + '已看人数：' + str(read)
 
@@ -394,18 +396,20 @@ class myui(form):
 
                 scid_item = QTableWidgetItem(scid)
                 self.okTable.setItem(newRow, 2, scid_item)
-                self.getpic(newRow,0,img)
+                self.getpic(newRow, 0, img)
                 item_video_url = QTableWidgetItem(video_url)
-                self.okTable.setItem(newRow,3,item_video_url)
-                item_video_width= QTableWidgetItem(str(video_width))
-                self.okTable.setItem(newRow,4,item_video_width)
-                item_video_height= QTableWidgetItem(str(video_height))
-                self.okTable.setItem(newRow,5,item_video_height)
+                self.okTable.setItem(newRow, 3, item_video_url)
+                item_video_width = QTableWidgetItem(str(video_width))
+                self.okTable.setItem(newRow, 4, item_video_width)
+                item_video_height = QTableWidgetItem(str(video_height))
+                self.okTable.setItem(newRow, 5, item_video_height)
 
                 newRow += 1
-                if newRow == 20:
+                if newRow == self.maxrows:
                     break
             self.btn_getlist.setDisabled(False)
+
+
     def getpic(self,row,col,img):
         try:
             #img = requests.get(cover).content

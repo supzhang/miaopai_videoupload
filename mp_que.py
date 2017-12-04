@@ -19,6 +19,8 @@ class que(QThread):
 
                 else:
                     tt.terminate()
+                    tt.exit()
+                    #print('-------',tt)
                     self.threads.remove(tt)
             if current_t == 0:
                 self.exit()
