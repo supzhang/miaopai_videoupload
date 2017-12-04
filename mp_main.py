@@ -25,6 +25,7 @@ class myui(form):
         #self.category.changeEvent().connect(self.writecat)
         self.category.currentIndexChanged.connect(self.writecat)
         self.seldia.clicked.connect(self.getfilename)
+        self.btn_hideuser.clicked.connect(self.hideUsers)
         self.btn_getlist.clicked.connect(self.getList)
         self.btn_del.clicked.connect(self.deleteVideo)
         self.btn_del_status.clicked.connect(self.del_status)
@@ -43,6 +44,7 @@ class myui(form):
         self.btn_getlist.setDisabled(True)
         self.btn_del.setDisabled(True)
         self.threads = []
+        self.hideuser = True #用户列表初始隐藏
 
         self.table_status.setHorizontalHeaderLabels(['状态','标题','进度条','日志','用户名'])
         self.finishTable.setHorizontalHeaderLabels(['标题', '信息', '帐号','文件名'])
@@ -130,7 +132,7 @@ class myui(form):
         file = QFileDialog.getOpenFileNames(self,
                                     "请选择需要上传的文件",
                                     path,
-                                    "所有文件::(*.mp4,*.3gp,*.mov,*.avi,*.wmv)MP4(*.mp4);;MOV(*.mov);;3gp(*.3gp);;avi(*.avi);;wmv(*.wmv)")
+                                    "所有类型(*.mp4;*.mov;*.3gp;*.wmv;*.avi);;MP4(*.mp4);;MOV(*.mov);;3gp(*.3gp);;avi(*.avi);;wmv(*.wmv)")
         paths = file[0]
         file_no = len(paths)
         try:
@@ -489,6 +491,17 @@ class myui(form):
     def writecat(self,index):
         self.conf['sort_index'] = str(index)
         writeConf(self.conf)
+    def hideUsers(self):
+        if self.hideuser == False:
+            self.mainv.setStretchFactor(self.main_v2, 2.7)
+            self.txt_userlist.setVisible(True)
+            self.hideuser = True
+            self.btn_hideuser.setText('隐藏用户栏')
+        else:
+            self.mainv.setStretchFactor(self.main_v2, 0)
+            self.txt_userlist.setVisible(False)
+            self.hideuser = False
+            self.btn_hideuser.setText('显示用户栏')
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     t = myui()

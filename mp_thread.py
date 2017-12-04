@@ -253,11 +253,11 @@ class mp_thread(QThread):
     def mkfile(self):  #检查文件是否上传正确self.headers['content-type'] = 'application/octet-stream'
         self.headers['content-type'] = 'text/plain;charset=UTF-8'
         #key_not_bin = 'stream/' + self.scid + '.mp4'
-        key = base64.b64encode(self.media_key.encode(encoding='utf-8')).decode()
-        fname = base64.b64encode(self.file_name.encode(encoding='utf-8')).decode()
-        scid = base64.b64encode(self.scid.encode(encoding='utf-8')).decode()
-        os_sdk = base64.b64encode('qiniu_web_sdk'.encode(encoding = 'utf-8')).decode()
-        upload_time = base64.b64encode(str(int(time.time()*1000)).encode(encoding='utf-8')).decode()
+        key = base64.b64encode(self.media_key.encode(encoding='utf-8')).decode().replace('/','_')
+        fname = base64.b64encode(self.file_name.encode(encoding='utf-8')).decode().replace('/','_')
+        scid = base64.b64encode(self.scid.encode(encoding='utf-8')).decode().replace('/','_')
+        os_sdk = base64.b64encode('qiniu_web_sdk'.encode(encoding = 'utf-8')).decode().replace('/','_')
+        upload_time = base64.b64encode(str(int(time.time()*1000)).encode(encoding='utf-8')).decode().replace('/','_')
          #上面将参数初始化，下面生成验证需要的URL
         url = 'http://upload.qbox.me/mkfile/' + str(self.file_size) + \
               '/key/' + key + \

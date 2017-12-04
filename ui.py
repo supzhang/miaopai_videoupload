@@ -10,6 +10,7 @@ class form(QWidget):
         super().__init__()
         self.setupUI()
     def setupUI(self):
+
         pixmap = QPixmap('a.png')
         titleIco = QIcon(pixmap)
         self.setWindowIcon(titleIco)
@@ -17,6 +18,7 @@ class form(QWidget):
 
         self.main_v1 = QVBoxLayout()
         self.main_v2 = QVBoxLayout()
+
         self.main_v3 = QVBoxLayout()
         self.main_v4 = QVBoxLayout()
         self.hideitem = QLabel()
@@ -33,7 +35,7 @@ class form(QWidget):
 
         self.mainv.setStretchFactor(self.main_v1,6)
 
-        self.mainv.setStretchFactor(self.main_v2,2.7)
+        self.mainv.setStretchFactor(self.main_v2,0)
         self.mainv.setStretchFactor(self.main_v3,5)
 
 
@@ -42,6 +44,7 @@ class form(QWidget):
         lab_pass = QLabel('密码:',self)
         self.txt_pass = QLineEdit('',self)
         self.txt_userlist = QTableWidget(0,3)
+        self.txt_userlist.setVisible(False)
         self.txt_userlist.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.txt_userlist.setColumnHidden(2,True)
         self.txt_userlist.setHorizontalHeaderLabels(["用户名",'本次已传'])
@@ -63,6 +66,7 @@ class form(QWidget):
         self.table_status.setColumnHidden(2,True)
         self.btn_login = QPushButton('登陆', self)
         self.btn_getusers = QPushButton('载入用户列表',self)
+        self.btn_hideuser = QPushButton('显示用户栏',self)
 
         self.seldia = QPushButton('选择上传文件',self)
         self.txt_path = QLabel('',self)
@@ -163,6 +167,7 @@ class form(QWidget):
         hbox_loginfo.addWidget(self.txt_pass)
         hbox_loginfo.addWidget(self.btn_login)
         hbox_loginfo.addWidget(self.btn_getusers)
+        hbox_loginfo.addWidget(self.btn_hideuser)
 
 
         #hbox_loginfo.addWidget(self.upload)
