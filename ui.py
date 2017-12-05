@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# -*- coding: UTF-8 -*-
 
 from PyQt5.QtWidgets import QDialog, QHBoxLayout,QVBoxLayout,QPushButton,QLineEdit,QTextEdit,QLabel,QComboBox,QCheckBox,QTableWidget,QWidget,QAbstractItemView,QHeaderView
 from PyQt5.QtGui import QIcon,QPixmap
@@ -11,10 +11,10 @@ class form(QWidget):
         self.setupUI()
     def setupUI(self):
 
-        pixmap = QPixmap('a.png')
+        pixmap = QPixmap(r'image\ico.ico')
         titleIco = QIcon(pixmap)
         self.setWindowIcon(titleIco)
-        self.setWindowTitle('秒拍数据上传 171204 1:30 from zzy Q:1728570648 仅供测试，勿用于非法活动！')
+        self.setWindowTitle('秒拍数据上传 171205 from zzy Q:1728570648 仅供测试，勿用于非法活动！')
 
         self.main_v1 = QVBoxLayout()
         self.main_v2 = QVBoxLayout()

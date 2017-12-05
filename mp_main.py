@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
+#打包命令nuitka --windows-disable-console --recurse-all --output-dir=D:\output --python-version=3.6 --icon=image\ico.ico mp_main.py
 from PyQt5.QtWidgets import QApplication,QFileDialog,QTableWidgetItem,QLabel,QMessageBox
-from PyQt5.QtCore import pyqtSignal,Qt
+from PyQt5.QtCore import pyqtSignal,Qt,QTextCodec
 from mp_que import que
 from get_conf import getConf,writeConf
 import sys,time,os,re
@@ -10,6 +11,8 @@ from ui import form
 import requests
 from requests.adapters import HTTPAdapter
 import webbrowser
+# codec = QTextCodec.codecForName("GBK")
+# QTextCodec.setCodecForLocale(codec)
 class myui(form):
 
     txtSignal = pyqtSignal(list)
