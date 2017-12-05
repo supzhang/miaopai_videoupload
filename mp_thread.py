@@ -83,7 +83,18 @@ class mp_thread(QThread):
                         return
 
                 else:
+                    time.sleep(1)
                     checkVideoStatus = self.checkVideoStatus()
+                    if checkVideoStatus['check_status_ok'] == 0:
+                        if upload_video_n < self.retry_times:
+                            self.statusChange(3,'未在服务器中找到上传的视频，重新上传，次数：' + str(upload_video_n))
+                            self.retry_times += 1
+                            continue
+                        else:
+                            ftxt = '上传失败，重试超过限制次数，停止上传'
+                            self.finsig.append(ftxt)
+                            self.finishOkSignal.emit([0,self.finsig])
+                            return
                     time.sleep(0.3)
                     coverTrans = self.coverTrans(checkVideoStatus['w'],checkVideoStatus['h'])
                     time.sleep(0.3)
@@ -316,14 +327,22 @@ class mp_thread(QThread):
         while retry_times1 > t:
             try:
                 res = self.sess.post(url_api, headers=self.headers, data={'scid': self.scid})
-                check_status_ok = 1
-                msg = '可以正常获取到上传视频的信息'
                 res_json = res.json()
+                if res_json['data'] is None:
+                    h = ''
+                    w = ''
+                    check_status_ok = 0
+                    msg = '未找到上传视频，上传失败！'
+                else:
+                    check_status_ok = 1
+                    msg = '可以正常获取到上传视频的信息'
+                    h = res_json['data']['ext']['h']
+                    w = res_json['data']['ext']['w']
+                    break
                 print(res_json)
 
-                h = res_json['data']['ext']['h']
-                w = res_json['data']['ext']['w']
-                break
+
+
 
             except Exception as e:
                 check_status_ok = 0

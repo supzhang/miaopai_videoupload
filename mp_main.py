@@ -81,6 +81,8 @@ class myui(form):
             self.txtSignal.emit(['警告','本版本已经过期，请下载新版本使用:https://link.zhihu.com/?target=https%3A//pan.baidu.com/s/1eRR2PSA'])
             return
         self.upload.setDisabled(True)
+        if len(self.paths) == 0:
+            return
         for path in self.paths:
             self.runthread(path[0],path[1]) #路径名，路径标识
         self.q = que(self.threads)
