@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/miaopai.iml" filepath="$PROJECT_DIR$/.idea/miaopai.iml" />
+      <module fileurl="file://E:\python_project\miaopai_videoupload\.idea\miaopai.iml" filepath="E:\python_project\miaopai_videoupload\.idea\miaopai.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/miaopai_videoupload.iml" filepath="$PROJECT_DIR$/.idea/miaopai_videoupload.iml" />
     </modules>
   </component>
 </project>

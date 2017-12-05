@@ -259,7 +259,7 @@ class mp_thread(QThread):
         scid = base64.urlsafe_b64encode(self.scid.encode(encoding='utf-8')).decode()
         os_sdk = base64.urlsafe_b64encode('qiniu_web_sdk'.encode(encoding = 'utf-8')).decode()
         upload_time = base64.urlsafe_b64encode(str(int(time.time()*1000)).encode(encoding='utf-8')).decode()
-        print(upload_time, type(upload_time))
+        #print(upload_time, type(upload_time))
          #上面将参数初始化，下面生成验证需要的URL
         url = 'http://upload.qbox.me/mkfile/' + str(self.file_size) + \
               '/key/' + key + \

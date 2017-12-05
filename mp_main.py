@@ -11,6 +11,7 @@ import requests
 from requests.adapters import HTTPAdapter
 import webbrowser
 class myui(form):
+
     txtSignal = pyqtSignal(list)
     deleteSignal = pyqtSignal(str)
     msgboxSignal = pyqtSignal(list)
@@ -42,7 +43,7 @@ class myui(form):
         self.btn_getlist.setDisabled(True)
         self.btn_del.setDisabled(True)
         self.threads = []
-        self.hideuser = True #用户列表初始隐藏
+        self.hideuser = False #用户列表初始隐藏
         self.maxrows = 20 #视频列表最大数量
 
         self.table_status.setHorizontalHeaderLabels(['状态','标题','进度条','日志','用户名'])
