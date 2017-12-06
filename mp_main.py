@@ -12,8 +12,7 @@ from ui import form
 import requests
 from requests.adapters import HTTPAdapter
 import webbrowser
-# codec = QTextCodec.codecForName("GBK")
-# QTextCodec.setCodecForLocale(codec)
+
 class myui(form):
 
     txtSignal = pyqtSignal(list)

@@ -5,7 +5,7 @@ import time
 class que(QThread):
     def __init__(self,threads):
         super().__init__()
-        self.thread_no =2
+        self.thread_no =20
         self.threads = threads
 
     def run(self):
