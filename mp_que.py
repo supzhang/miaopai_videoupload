@@ -3,9 +3,9 @@
 from PyQt5.QtCore import QThread
 import time
 class que(QThread):
-    def __init__(self,threads):
+    def __init__(self,threads,threadno):
         super().__init__()
-        self.thread_no =20
+        self.thread_no =threadno
         self.threads = threads
 
     def run(self):

@@ -310,10 +310,10 @@ class mp_thread(QThread):
 
                 if msg == 'success':
                     check_ok = 1
-                    msg = self.file_name + '文件检验完成！'
+                    msg = '文件校验完成！'  #self.file_name +
                 else:
                     check_ok = 0
-                    msg = self.file_name + '文件检验失败！'
+                    msg =  '文件校验失败！'
                 ret = {
                     'check_ok':check_ok,
                     'msg':msg,

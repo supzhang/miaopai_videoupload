@@ -94,7 +94,8 @@ class myui(form):
             return
         for path in self.paths:
             self.runthread(path[0],path[1]) #路径名，路径标识
-        self.q = que(self.threads)
+        t = int(self.selThread.currentText())
+        self.q = que(self.threads,t)
         self.q.start()
         self.q.exec()
 
@@ -581,7 +582,6 @@ class myui(form):
         return retlist
     def pack_users(self,user,pwd):
         hasUser = 0
-        print('retlist',self.retList)
         for x in self.retList:
             if user == x[0]:
                 hasUser = 1

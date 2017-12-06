@@ -98,6 +98,14 @@ class form(QWidget):
         self.hasad = QCheckBox('含有广告',self)
         self.orintal = QCheckBox('原创内容',self)
         self.serial = QCheckBox('连载内容',self)
+        self.lab_selThread = QLabel('线程数：',self)
+        self.lab_selThread.setFixedWidth(50)
+        self.selThread = QComboBox()
+        self.selThread.setFixedWidth(40)
+        for x in range(20):
+            self.selThread.insertItem(x,str(x+1))
+        self.selThread.setCurrentIndex(2)
+
         self.upload = QPushButton('上传',self)
         self.btn_del_status = QPushButton('删除记录',self)
         self.btn_del_status.setVisible(False)
@@ -181,6 +189,9 @@ class form(QWidget):
         hbox6.addWidget(self.hasad)
         hbox6.addWidget(self.orintal)
         hbox6.addWidget(self.serial)
+        hbox6.addWidget(self.lab_selThread)
+        hbox6.addWidget(self.selThread)
+
         hbox6.addWidget(self.upload)
         hbox6.addWidget(self.btn_del_status)
 
