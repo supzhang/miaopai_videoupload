@@ -2,7 +2,7 @@
 import base64
 import os
 def getConf():
-    confs = ['user_list_path','video_path','sort_index','user','pwd'] #用户列表路径，视频路径，视频分类索引
+    confs = ['user_list_path','video_path','sort_index','user','pwd','custom_tag','topics'] #用户列表路径，视频路径，视频分类索引
     path = os.getcwd()
     filename = path +r'\conf.txt'
     f = open(filename,'a+')

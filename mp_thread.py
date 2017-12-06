@@ -38,109 +38,112 @@ class mp_thread(QThread):
 
     def run(self):
         init_upload_n = 0
-        while True:#init_upload_n < self.retry_times:
-            init_upload = self.init_upload()
-           # print('init_upload', init_upload)
-            time.sleep(0.3)
-            self.statusChange(3,init_upload['msg'])
-            if init_upload['init_ok'] == 0: #初始化失败，重新上初始化
-                init_upload += 1
-                if init_upload_n < self.retry_times:
-                    txt = '初始化失败，重新初始化！重试次数：' + str(init_upload_n)
-                    self.statusChange(2,txt)
-                    continue
-                else:
-                    ftxt = '初始化失败，重新初始化！重试超过限制次数，停止上传'
-                    self.finsig.append(ftxt)
-                    self.statusChange(3,ftxt)
-                    self.finishSignal.emit([0,self.finsig])
-                    return
-
-            #else: #初始化成功，开始上传
-            checktitle = self.checkTitle()
-            if checktitle['check_title_ok'] == 0:
-                self.statusChange(2,checktitle['msg'])
-                break
-
-            self.statusChange(3,'开始上传文件!')
-            upload_video_n = 0
-            while True:#upload_video_n < self.retry_times:
-                upload_videos = self.upload_video(self.path)
-                self.statusChange(3,upload_videos['msg'])
-                mkfile = self.mkfile()
-                self.statusChange(3,mkfile['msg'])
-
-                if upload_videos['upload_ok'] == 0 or mkfile['check_ok'] == 0: #如果上传失败
-                    upload_video_n += 1
-                    if upload_video_n < self.retry_times:
-                        self.statusChange(3,'上传失败，重新上传数据，次数：' + str(upload_video_n))
+        try:
+            while True:#init_upload_n < self.retry_times:
+                init_upload = self.init_upload()
+               # print('init_upload', init_upload)
+                time.sleep(0.3)
+                self.statusChange(3,init_upload['msg'])
+                if init_upload['init_ok'] == 0: #初始化失败，重新上初始化
+                    init_upload += 1
+                    if init_upload_n < self.retry_times:
+                        txt = '初始化失败，重新初始化！重试次数：' + str(init_upload_n)
+                        self.statusChange(2,txt)
                         continue
                     else:
-                        ftxt = '上传失败，重试超过限制次数，停止上传'
-                        self.statusChange(3,ftxt)
+                        ftxt = '初始化失败，重新初始化！重试超过限制次数，停止上传'
                         self.finsig.append(ftxt)
+                        self.statusChange(3,ftxt)
                         self.finishSignal.emit([0,self.finsig])
                         return
 
-                else:
-                    time.sleep(1)
-                    checkVideoStatus = self.checkVideoStatus()
-                    if checkVideoStatus['check_status_ok'] == 0:
+                #else: #初始化成功，开始上传
+                checktitle = self.checkTitle()
+                if checktitle['check_title_ok'] == 0:
+                    self.statusChange(2,checktitle['msg'])
+                    break
+
+                self.statusChange(3,'开始上传文件!')
+                upload_video_n = 0
+                while True:#upload_video_n < self.retry_times:
+                    upload_videos = self.upload_video(self.path)
+                    self.statusChange(3,upload_videos['msg'])
+                    mkfile = self.mkfile()
+                    self.statusChange(3,mkfile['msg'])
+
+                    if upload_videos['upload_ok'] == 0 or mkfile['check_ok'] == 0: #如果上传失败
+                        upload_video_n += 1
                         if upload_video_n < self.retry_times:
-                            self.statusChange(3,'未在服务器中找到上传的视频，重新上传，次数：' + str(upload_video_n))
-                            self.retry_times += 1
+                            self.statusChange(3,'上传失败，重新上传数据，次数：' + str(upload_video_n))
                             continue
                         else:
                             ftxt = '上传失败，重试超过限制次数，停止上传'
+                            self.statusChange(3,ftxt)
                             self.finsig.append(ftxt)
-                            self.finishOkSignal.emit([0,self.finsig])
+                            self.finishSignal.emit([0,self.finsig])
                             return
-                    time.sleep(0.3)
-                    coverTrans = self.coverTrans(checkVideoStatus['w'],checkVideoStatus['h'])
-                    time.sleep(0.3)
-                    videoTransNew = self.videoTransNew(checkVideoStatus['w'],checkVideoStatus['h'])
 
-                    self.statusChange(3,'正在等待获取封面地址,60秒内无法获取将停止...')
-
-                    getCovers = self.getCovers()
-                    print(getCovers)
-                    if getCovers['getcover_ok'] == 1:
-                        getUploadCoverimage = self.getCoverimage(getCovers['image_path'])
-                        self.statusChange(3,getUploadCoverimage['msg'])
-                        publishNew = self.publishNew(checkVideoStatus['w'],checkVideoStatus['h'])
-                        self.statusChange(1,publishNew['msg'])
+                    else:
                         time.sleep(1)
-                        self.finishOkSignal.emit(20)
-                        return
-                    elif getCovers['getcover_ok'] == 2:
-                        try:
-                            self.statusChange(2,'发现与视频文件同名图片，使用此图片做为封面！')
-                        except Exception as e:
-                            print(e)
-                        upload_res = self.UploadCoverimage(getCovers['image'])
-                        if upload_res['message'] == 'success':
-                            time.sleep(1)
+                        checkVideoStatus = self.checkVideoStatus()
+                        if checkVideoStatus['check_status_ok'] == 0:
+                            if upload_video_n < self.retry_times:
+                                self.statusChange(3,'未在服务器中找到上传的视频，重新上传，次数：' + str(upload_video_n))
+                                self.retry_times += 1
+                                continue
+                            else:
+                                ftxt = '上传失败，重试超过限制次数，停止上传'
+                                self.finsig.append(ftxt)
+                                self.finishOkSignal.emit([0,self.finsig])
+                                return
+                        time.sleep(0.3)
+                        coverTrans = self.coverTrans(checkVideoStatus['w'],checkVideoStatus['h'])
+                        time.sleep(0.3)
+                        videoTransNew = self.videoTransNew(checkVideoStatus['w'],checkVideoStatus['h'])
+
+                        self.statusChange(3,'正在获取封面,60秒内无法获取将停止...')
+
+                        getCovers = self.getCovers()
+                        print(getCovers)
+                        if getCovers['getcover_ok'] == 1:
+                            getUploadCoverimage = self.getCoverimage(getCovers['image_path'])
+                            self.statusChange(3,getUploadCoverimage['msg'])
                             publishNew = self.publishNew(checkVideoStatus['w'],checkVideoStatus['h'])
                             self.statusChange(1,publishNew['msg'])
                             time.sleep(1)
                             self.finishOkSignal.emit(20)
                             return
-                        else:
-                            pass
+                        elif getCovers['getcover_ok'] == 2:
+                            try:
+                                self.statusChange(2,'发现与视频文件同名图片，使用此图片做为封面！')
+                            except Exception as e:
+                                print(e)
+                            upload_res = self.UploadCoverimage(getCovers['image'])
+                            if upload_res['message'] == 'success':
+                                time.sleep(1)
+                                publishNew = self.publishNew(checkVideoStatus['w'],checkVideoStatus['h'])
+                                self.statusChange(1,publishNew['msg'])
+                                time.sleep(1)
+                                self.finishOkSignal.emit(20)
+                                return
+                            else:
+                                pass
 
 
-                    else:
-                        if upload_video_n < self.retry_times:
-                            continue
                         else:
-                            self.statusChange(2,'获取封面或发布失败！')
-                            self.finsig.append('获取封面或发布失败！')
-                            self.finishSignal.emit([0,self.finsig])
-                            return
-            if upload_video_n < self.retry_times:
-                continue
-            else:
-                break
+                            if upload_video_n < self.retry_times:
+                                continue
+                            else:
+                                self.statusChange(2,'获取封面或发布失败！')
+                                self.finsig.append('获取封面或发布失败！')
+                                self.finishSignal.emit([0,self.finsig])
+                                return
+                if upload_video_n < self.retry_times:
+                    continue
+                else:
+                    break
+        except Exception as e:
+            print('------------出错信息-----------：',e)
     def statusChange(self,status,msg):
         sig = {1:'成功',
                2:'失败',

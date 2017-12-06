@@ -2,7 +2,9 @@
 
 from PyQt5.QtWidgets import QDialog, QHBoxLayout,QVBoxLayout,QPushButton,QLineEdit,QTextEdit,QLabel,QComboBox,QCheckBox,QTableWidget,QWidget,QAbstractItemView,QHeaderView
 from PyQt5.QtGui import QIcon,QPixmap
-
+from PyQt5.QtWebEngineWidgets import QWebEngineView
+from PyQt5.QtCore import QUrl,Qt
+import os
 
 
 class form(QWidget):
@@ -11,10 +13,10 @@ class form(QWidget):
         self.setupUI()
     def setupUI(self):
 
-        pixmap = QPixmap(r'image\ico.ico')
+        pixmap = QPixmap(r'image/ico.ico')
         titleIco = QIcon(pixmap)
         self.setWindowIcon(titleIco)
-        self.setWindowTitle('秒拍数据上传 171205 from zzy Q:1728570648 仅供测试，勿用于非法活动！')
+        self.setWindowTitle('秒拍号数据上传 171205 from zzy Q:1728570648 仅供测试，勿用于非法活动！')
 
         self.main_v1 = QVBoxLayout()
         self.main_v2 = QVBoxLayout()
@@ -40,7 +42,14 @@ class form(QWidget):
 
 
         lab_user = QLabel('用户名:',self)
-        self.txt_user = QLineEdit('',self)
+        #self.txt_user = QLineEdit('',self)
+        self.txt_user = QComboBox()
+        #self.txt_user.insertItem(1,'aaaaa')
+        print(self.txt_user.currentText())
+        #self.txt_user.setInputMethodHints(Qt.ImhPreferNumbers)
+        self.txt_user.setEditable(True)
+        #self.txt_user.setInputMethodHints(Qt.Imh)
+
         lab_pass = QLabel('密码:',self)
         self.txt_pass = QLineEdit('',self)
         self.txt_userlist = QTableWidget(0,3)
@@ -91,7 +100,6 @@ class form(QWidget):
         self.upload = QPushButton('上传',self)
         self.btn_del_status = QPushButton('删除记录',self)
         self.btn_del_status.setVisible(False)
-        #self.items = QLabel()
 
         #self.lab1 = QLabel('本次完成的上传',self)
         self.finishTable = QTableWidget(0,4)
@@ -101,31 +109,47 @@ class form(QWidget):
         self.btn_del =QPushButton('删除视频',self)
         self.allVideosNo = QLabel('',self)  #视频总数
         self.btn_getlist = QPushButton('获取视频列表（前20条）',self)
+        self.lab_help = QLabel('<a href="#"><img src="image/help.ico"/>关闭帮助<a/>',self)
+
         self.okTable = QTableWidget(0,6)
+        self.okTable_over =QTextEdit()
+        self.okTable_over.setReadOnly(True)
+
         self.okTable.setAlternatingRowColors(True)
         self.okTable.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.okTable.horizontalHeader().setSectionResizeMode(0,QHeaderView.ResizeToContents)
         # self.okTable.horizontalHeader().setSectionResizeMode(1,QHeaderView.ResizeToContents)
         self.okTable.setSelectionMode(QAbstractItemView.SingleSelection)
         self.okTable.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.okTable.setVisible(True)
+
 
 
         self.main_v3_h1 = QHBoxLayout()
         self.main_v3_h1.addWidget(self.btn_del)
         self.main_v3_h1.addWidget(self.btn_getlist)
         self.main_v3_h1.addWidget(self.allVideosNo)
+        self.main_v3_h1.addWidget(self.lab_help)
+        #self.lab_help.setWindowIcon(titleIco)
+        self.main_v3_h1.setStretchFactor(self.btn_del,1.5)
+        self.main_v3_h1.setStretchFactor(self.btn_getlist,2)
+        self.main_v3_h1.setStretchFactor(self.allVideosNo,3)
+        self.main_v3_h1.setStretchFactor(self.lab_help,1)
+
+
+
+
         self.main_v3.addLayout(self.main_v3_h1)
+        self.main_v3.addWidget(self.okTable_over)
         self.main_v3.addWidget(self.okTable)
+
+
         self.okTable.setColumnHidden(2,True)
         self.okTable.setColumnHidden(3,True)
         self.okTable.setColumnHidden(4,True)
         self.okTable.setColumnHidden(5,True)
         # self.okTable.setColumnHidden(1,True)
 
-       # self.okTable.horizontalHeader().setSectionResizeMode(QHeaderView.setSectionResizeMode())
-
-        # self.main_v2.addWidget(self.lab1)
-        # self.main_v2.addWidget(self.finishTable)
         self.main_v2.addWidget(self.txt_userlist)
 
         hbox_loginfo = QHBoxLayout()
@@ -137,9 +161,7 @@ class form(QWidget):
         hbox6 = QHBoxLayout()
         vbox1 = QHBoxLayout()
 
-        #vbox1.addWidget(self.txt_userlist)
         vbox1.addWidget(self.table_status)#txt_info)
-        #vbox1.setStretchFactor(self.txt_userlist,4)
         vbox1.setStretchFactor(self.txt_info,6)
 
         hbox3.addWidget(self.txt_ftitle)
@@ -190,6 +212,36 @@ class form(QWidget):
 
         self.setLayout(self.mainv)
         self.show()
+    def gethelp(self):
+        path = os.getcwd()
+        helpname = path + r'\\readme.html'
+        if not os.path.exists(helpname):
+            return ''
+        with open(helpname,'r') as f:
+            help = f.read()
+            return help
+class user_info(QDialog):
+    def __init__(self,sess):
+        super().__init__()
+        self.headers = {
+            'user-agent':'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36',
+            'Cache-Control': 'max-age=0',
+            'X-Requested-With':'XMLHttpRequest',
+            'Accept': 'application/json, text/plain, */*',
+            'Upgrade-Insecure-Requests': '1',
+            'Accept-Encoding': 'gzip, deflate',
+            'Referer':'http://creator.miaopai.com/login',
+            'Accept-Language': 'zh-CN,zh;q=0.8',
+        }
+    def getInfo(self):  #获取用户信息
+        url_api = 'http://creator.miaopai.com/profile/getInfo?type=full&ptype=0'
+        try:
+            res = self.sess.get(url_api,headers = self.headers)
+            ret = [1,res.json()]
+        except Exception as e:
+            ret = [0,]
+            print(e)
+        return ret
 
 #class player_ui(object):
 #    def __init__(self, width, height, url):

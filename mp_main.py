@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 #打包命令nuitka --windows-disable-console --recurse-all --output-dir=D:\output --python-version=3.6 --icon=image\ico.ico mp_main.py
 from PyQt5.QtWidgets import QApplication,QFileDialog,QTableWidgetItem,QLabel,QMessageBox
+
 from PyQt5.QtCore import pyqtSignal,Qt,QTextCodec
 from mp_que import que
 from get_conf import getConf,writeConf
@@ -21,11 +22,14 @@ class myui(form):
 
     def __init__(self):
         super().__init__()
+        self.s1 = '==|=='  #用户之间的分割
+        self.s2 = '=|='  #用户名密码的分割
         self.msgboxSignal.connect(self.messagebox)
         self.btn_login.clicked.connect(self.login)
         self.upload.clicked.connect(self.mutiThread)
 
         self.conf = getConf() #获取配置文件
+        self.retList = self.unpack_users()
         #self.category.changeEvent().connect(self.writecat)
         self.category.currentIndexChanged.connect(self.writecat)
         self.seldia.clicked.connect(self.getfilename)
@@ -35,6 +39,8 @@ class myui(form):
         self.btn_del_status.clicked.connect(self.del_status)
         self.txtSignal.connect(self.messagebox)
         self.deleteSignal.connect(self.deleteVideo)
+        self.lab_help.linkActivated.connect(self.help)
+        self.txt_user.currentTextChanged.connect(self.userChange)
         #self.picTipSignal.connect(self.picTip)
         self.okTable.cellClicked.connect(self.video_play)
         self.btn_getusers.clicked.connect(self.get_userlist)
@@ -48,6 +54,7 @@ class myui(form):
         self.threads = []
         self.hideuser = False #用户列表初始隐藏
         self.maxrows = 20 #视频列表最大数量
+        self.display_help = True #是否显示帮助
 
         self.table_status.setHorizontalHeaderLabels(['状态','标题','进度条','日志','用户名'])
         self.finishTable.setHorizontalHeaderLabels(['标题', '信息', '帐号','文件名'])
@@ -65,6 +72,7 @@ class myui(form):
         }
         # self.txt_user.setText('15966318237')
         # self.txt_pass.setText('caolei2121')
+        self.readHelp()  #读取帮助文件
         self.isLogin = False
         self.txt_info.setReadOnly(True)
         self.threadno = 0 #线程号 传递到子线程，返回数据时需要提供
@@ -72,13 +80,15 @@ class myui(form):
                              '失败':QColor('red'),
                              '运行中':QColor('blue')
                              }
-        if len(self.conf['user']) > 1:
-            self.txt_user.setText(self.conf['user'])
-        if len(self.conf['pwd']) > 1:
-            self.txt_pass.setText(self.conf['pwd'])
+        # if len(self.conf['user']) > 1:
+        #     self.txt_user.setText(self.conf['user'])
+        # if len(self.conf['pwd']) > 1:
+        #     self.txt_pass.setText(self.conf['pwd'])
+        self.topics.setText(self.conf['topics'])
+        self.custom_tag.setText(self.conf['custom_tag'])
     def mutiThread(self): #选择多文件同时上传
         if self.reg() == 0:
-            self.txtSignal.emit(['警告','本版本已经过期，请下载新版本使用:https://link.zhihu.com/?target=https%3A//pan.baidu.com/s/1eRR2PSA'])
+            self.txtSignal.emit(['警告','本版本已经过期，请下载新版本使用:https://pan.baidu.com/s/1eRR2PSA'])
             return
         self.upload.setDisabled(True)
         if len(self.paths) == 0:
@@ -101,7 +111,7 @@ class myui(form):
             del self.sess
             self.isLogin = 0
         else:
-            self.phone = self.txt_user.text()
+            self.phone = self.txt_user.currentText()
             pwd = self.txt_pass.text()
             if len(self.phone.strip()) < 5 or len(pwd.strip()) < 5:
                 self.msgboxSignal.emit(['输入错误','请输入正确的用户名密码'])
@@ -120,9 +130,10 @@ class myui(form):
             self.btn_login.setText('正在登陆')
             self.btn_login.setDisabled(True)
             self.seldia.setDisabled(False)
-            self.conf['user'] = self.phone
-            self.conf['pwd'] = pwd
-            writeConf(self.conf)
+            self.pack_users(self.phone,pwd)
+            # self.conf['user'] = self.phone
+            # self.conf['pwd'] = pwd
+            # writeConf(self.conf)
 
 
     def getfilename(self):
@@ -193,7 +204,7 @@ class myui(form):
             return
         self.conf['user_list_path'] = os.path.dirname(file[0])
         writeConf(self.conf)
-
+        self.hideUsers()
         with open(file[0],'r',errors = 'ignore') as f:
             lines = f.readlines()
             n = 0
@@ -245,8 +256,20 @@ class myui(form):
 
 
 
-            custom_tag_ = self.custom_tag.text()
-            topics_ = self.topics.text()
+            custom_tag_ = self.custom_tag.text().replace('，',',').strip()
+            topics_ = self.topics.text().replace('，',',').strip()
+            isChange = 0
+            #处理暂存标签及话题
+            if len(custom_tag_) != 0:
+                self.conf['custom_tag'] = custom_tag_
+                isChange = 1
+            if len(custom_tag_) != 0:
+                self.conf['topics'] = topics_
+                isChange = 1
+            if isChange == 1:
+                writeConf(self.conf)
+
+
             category_ = self.getCategory()
 
             orintal_ = 1 if self.orintal.isChecked() else 0
@@ -320,7 +343,10 @@ class myui(form):
         if msg[0] == 1:
             for l in range(self.txt_userlist.rowCount()):
                 if self.txt_userlist.item(l, 0).text() == msg[1][0]:
-                    previous_n = self.txt_userlist.item(l, 1)
+                    try:
+                         previous_n = self.txt_userlist.item(l, 1).text()
+                    except Exception as e:
+                        previous_n = '0'
                     
                     n = int(previous_n)  if previous_n else 0
                     item = QTableWidgetItem(str(n + 1))
@@ -466,7 +492,9 @@ class myui(form):
     def adduser(self,row,col):
         user = self.txt_userlist.item(row,0).text()
         pwd = self.txt_userlist.item(row,2).text()
-        self.txt_user.setText(user)
+        self.txt_user.insertItem(self.usersCount, user)
+        self.txt_user.setCurrentIndex(self.usersCount)
+        self.usersCount += 1
         self.txt_pass.setText(pwd)
         self.login()
     def statusChangem(self,info):#线程序号，状态，实时状态，提示
@@ -512,6 +540,67 @@ class myui(form):
             self.txt_userlist.setVisible(False)
             self.hideuser = False
             self.btn_hideuser.setText('显示用户栏')
+    def readHelp(self):
+        path = os.getcwd()
+        name = path + r'\\readme.html'
+        if os.path.exists(name):
+            with open(name,'r') as f:
+                html = f.read()
+        else:
+            html = '未找到帮助文件'
+        self.okTable_over.setText(html)
+    def help(self):
+        if  self.display_help == True:
+            self.lab_help.setText('<a href="#"><img src="image/help.ico"/>帮助<a/>')
+            self.okTable_over.setVisible(False)
+            self.display_help = False
+        else:
+            self.lab_help.setText('<a href="#"><img src="image/help.ico"/>关闭帮助<a/>')
+            self.okTable_over.setVisible(True)
+
+            self.display_help = True
+    def unpack_users(self):
+        retlist = []
+        self.usersCount = 0
+
+        users = self.conf['user']
+
+        users_list = users.split(self.s1) if self.s1 in users else [users]
+        for user in users_list:
+            if self.s2 in user:
+                up = user.split(self.s2)
+                phone = up[0]
+                pwd = up[1]
+                self.txt_user.insertItem(self.usersCount,phone)
+                retlist.append([phone,pwd])
+                self.usersCount += 1
+            else:
+                continue
+        if len(retlist) > 0:
+            self.txt_user.setCurrentIndex(0)
+            self.txt_pass.setText(retlist[0][1])
+        return retlist
+    def pack_users(self,user,pwd):
+        hasUser = 0
+        print('retlist',self.retList)
+        for x in self.retList:
+            if user == x[0]:
+                hasUser = 1
+                break
+        if hasUser == 0:
+            
+            txt = user + self.s2 + pwd
+            self.conf['user'] = self.s1.join([self.conf['user'], txt])
+            writeConf(self.conf)
+    def userChange(self,u):
+        pwd = ''
+        for user in self.retList:
+            if user[0] == u:
+                pwd = user[1]
+        self.txt_pass.setText(pwd)
+
+
+
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     t = myui()
