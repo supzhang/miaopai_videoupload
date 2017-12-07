@@ -366,7 +366,7 @@ class myui(form):
             pass
         for t in self.threads:
             try:
-                t.terminate()
+                t[0].terminate()
                 closedTrhead += 1
             except:
                 pass
@@ -379,7 +379,6 @@ class myui(form):
                 item = QTableWidgetItem('终止')
                 self.table_status.setItem(x,0,item)
     def getList(self,no): #获取视频列表
-            
         try:
             time.sleep(1)
             self.getlist_disable(1)
