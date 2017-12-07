@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import QApplication,QFileDialog,QTableWidgetItem,QLabel,QMe
 from PyQt5.QtCore import pyqtSignal,Qt,QTextCodec
 from mp_que import que
 from get_conf import getConf,writeConf
+from reg_Update import update
 import sys,time,os,re
 from PyQt5.QtGui import QPixmap,QColor
 from mp_thread import mp_thread,loginThread,getVideothread
@@ -12,24 +13,28 @@ from ui import form
 import requests
 from requests.adapters import HTTPAdapter
 import webbrowser
-# codec = QTextCodec.codecForName("GBK")
-# QTextCodec.setCodecForLocale(codec)
-class myui(form):
 
+class myui(form):
     txtSignal = pyqtSignal(list)
     deleteSignal = pyqtSignal(str)
     msgboxSignal = pyqtSignal(list)
-
     def __init__(self):
         super().__init__()
+        ####################检测新版本########################
+        version = '20171206'   #本软件版本
+        self.setWindowTitle('秒拍视频上传工具')
+        u = update(version)
+        u.hasNewVersion.connect(self.hasNew)
+        u.hasNewVersion.connect(self.hasNew)  #[是否有新版本,版本名,版本路径]
+        u.start()
+        #######################获取配置文件及解析配置，解析用户名密码################
         self.s1 = '==|=='  #用户之间的分割
         self.s2 = '=|='  #用户名密码的分割
+        self.conf = getConf() #
+        self.retList = self.unpack_users()
         self.msgboxSignal.connect(self.messagebox)
         self.btn_login.clicked.connect(self.login)
         self.upload.clicked.connect(self.mutiThread)
-
-        self.conf = getConf() #获取配置文件
-        self.retList = self.unpack_users()
         #self.category.changeEvent().connect(self.writecat)
         self.category.currentIndexChanged.connect(self.writecat)
         self.seldia.clicked.connect(self.getfilename)
@@ -599,6 +604,11 @@ class myui(form):
                 pwd = user[1]
         self.txt_pass.setText(pwd)
 
+    def hasNew(self,info):#[是否有新版本,版本名,版本路径]
+        if info[0] == 1:
+            t = QMessageBox.information(self,'提醒','已经有新版本' + info[1] + '\n，是否下载？',QMessageBox.Yes|QMessageBox.No,QMessageBox.Yes)
+            if t == QMessageBox.Yes:
+                webbrowser.open(info[2])
 
 
 if __name__ == '__main__':
