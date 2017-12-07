@@ -8,7 +8,7 @@ class update(QThread):
     hasNewVersion = pyqtSignal(list)
     def __init__(self,version):
         super().__init__()
-        t = '20170107'
+        t = '20180107'
         self.expire_time = int(time.mktime(time.strptime(t, "%Y%m%d")))  #过期日1516954276
         version_s = int(time.mktime(time.strptime(version, "%Y%m%d")))
         self.version = version_s

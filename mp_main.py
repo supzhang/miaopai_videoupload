@@ -87,7 +87,7 @@ class myui(form):
 
         self.topics.setText(self.conf['topics'])
         self.custom_tag.setText(self.conf['custom_tag'])
-        self.threads = []
+        self.threads = []  #存储线程变量  [[thread1,tag],[thread2,tag]]
 
     def mutiThread(self): #选择多文件同时上传
         if self.isReg == 0:
@@ -99,8 +99,8 @@ class myui(form):
             return
         for path in self.paths:
             self.runthread(path[0],path[1]) #路径名，路径标识
-        t = int(self.selThread.currentText())
-        self.q = que(self.threads,t)
+        maxThread = int(self.selThread.currentText())  #获取最大线程数
+        self.q = que(self.threads,maxThread)
         self.q.start()
         self.q.exec()
 
@@ -167,7 +167,7 @@ class myui(form):
                     filename = os.path.basename(path)
                     filenames.append(filename)
                     shortname = filename if len(filename) <= 15 else filename[:15] + '...'
-                    item_txt = ['未开始', shortname, '', '未开始', self.phone]
+                    item_txt = ['未开始', shortname, '', '未开始', self.phone,str(self.threadno)]
 
                     paths_l.append([path,self.threadno])
                     col = 0
@@ -309,8 +309,7 @@ class myui(form):
                     self.table_status.setItem(threadno,col,item)
                     if status == '失败':
                         self.table_status.item(threadno, 0).setBackground(self.status_color['失败'])
-                    #threadNoItem = QTableWidgetItem(str(threadno))
-                    #self.table_status.setItem(threadno, col, item)
+
                 col += 1
             self.table_status.item(threadno, 1).setToolTip(ftitle_)
             if titleok == False:
@@ -321,7 +320,7 @@ class myui(form):
             self.t.finishOkSignal.connect(self.getList)
             self.t.statusSignal.connect(self.statusChangem)
             self.t.setTerminationEnabled(True)
-            self.threads.append(self.t)
+            self.threads.append([self.t,threadno])
 
         except Exception as e:
             print(e)
