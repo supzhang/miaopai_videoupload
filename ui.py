@@ -2,8 +2,6 @@
 
 from PyQt5.QtWidgets import QDialog, QHBoxLayout,QVBoxLayout,QPushButton,QLineEdit,QTextEdit,QLabel,QComboBox,QCheckBox,QTableWidget,QWidget,QAbstractItemView,QHeaderView
 from PyQt5.QtGui import QIcon,QPixmap
-from PyQt5.QtWebEngineWidgets import QWebEngineView
-from PyQt5.QtCore import QUrl,Qt
 import os
 
 
@@ -16,7 +14,7 @@ class form(QWidget):
         pixmap = QPixmap(r'image/ico.ico')
         titleIco = QIcon(pixmap)
         self.setWindowIcon(titleIco)
-        self.setWindowTitle('秒拍号数据上传 171205 from zzy Q:1728570648 仅供测试，勿用于非法活动！')
+        self.setWindowTitle('秒拍号数据上传 171206 from zzy Q:1728570648 仅供测试，勿用于非法活动！')
 
         self.main_v1 = QVBoxLayout()
         self.main_v2 = QVBoxLayout()
@@ -31,32 +29,31 @@ class form(QWidget):
         self.mainv.addLayout(self.main_v3)
         self.mainv.addLayout(self.main_v4)
 
-        # self.view = QGraphicsView()
-        # self.main_v4.addWidget(self.view)
-
-
-        self.mainv.setStretchFactor(self.main_v1,6)
-
+        self.mainv.setStretchFactor(self.main_v1,5.5)
         self.mainv.setStretchFactor(self.main_v2,0)
-        self.mainv.setStretchFactor(self.main_v3,5)
+        self.mainv.setStretchFactor(self.main_v3,4.5)
 
 
         lab_user = QLabel('用户名:',self)
-        #self.txt_user = QLineEdit('',self)
+        lab_user.setFixedWidth(35)
+
         self.txt_user = QComboBox()
-        #self.txt_user.insertItem(1,'aaaaa')
-        print(self.txt_user.currentText())
-        #self.txt_user.setInputMethodHints(Qt.ImhPreferNumbers)
+        self.txt_user.setFixedWidth(90)
         self.txt_user.setEditable(True)
-        #self.txt_user.setInputMethodHints(Qt.Imh)
 
         lab_pass = QLabel('密码:',self)
+        lab_pass.setFixedWidth(30)
         self.txt_pass = QLineEdit('',self)
+        self.txt_pass.setFixedWidth(80)
         self.txt_userlist = QTableWidget(0,3)
         self.txt_userlist.setVisible(False)
         self.txt_userlist.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+
         self.txt_userlist.setColumnHidden(2,True)
-        self.txt_userlist.setHorizontalHeaderLabels(["用户名",'本次已传'])
+        self.txt_userlist.setHorizontalHeaderLabels(["用户名",'已传'])
+        self.txt_userlist.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeToContents)
+        self.txt_userlist.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeToContents)
+        #self.txt_userlist.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeToContents)
         #userlist_tip = QToolTip('双击帐号可直接登陆，但会停止原来的上传')
         self.txt_userlist.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.txt_userlist.setSelectionMode(QAbstractItemView.SingleSelection)
@@ -74,10 +71,14 @@ class form(QWidget):
 
         self.table_status.setColumnHidden(2,True)
         self.btn_login = QPushButton('登陆', self)
+        self.btn_login.setFixedWidth(80)
         self.btn_getusers = QPushButton('载入用户列表',self)
+        self.btn_getusers.setFixedWidth(90)
         self.btn_hideuser = QPushButton('显示用户栏',self)
+        self.btn_hideuser.setFixedWidth(80)
 
         self.seldia = QPushButton('选择上传文件',self)
+        self.seldia.setFixedWidth(100)
         self.txt_path = QLabel('',self)
 
         self.txt_ftitle = QLabel('视频标题：',self)
@@ -97,6 +98,14 @@ class form(QWidget):
         self.hasad = QCheckBox('含有广告',self)
         self.orintal = QCheckBox('原创内容',self)
         self.serial = QCheckBox('连载内容',self)
+        self.lab_selThread = QLabel('线程数：',self)
+        self.lab_selThread.setFixedWidth(50)
+        self.selThread = QComboBox()
+        self.selThread.setFixedWidth(40)
+        for x in range(20):
+            self.selThread.insertItem(x,str(x+1))
+        self.selThread.setCurrentIndex(2)
+
         self.upload = QPushButton('上传',self)
         self.btn_del_status = QPushButton('删除记录',self)
         self.btn_del_status.setVisible(False)
@@ -180,6 +189,9 @@ class form(QWidget):
         hbox6.addWidget(self.hasad)
         hbox6.addWidget(self.orintal)
         hbox6.addWidget(self.serial)
+        hbox6.addWidget(self.lab_selThread)
+        hbox6.addWidget(self.selThread)
+
         hbox6.addWidget(self.upload)
         hbox6.addWidget(self.btn_del_status)
 

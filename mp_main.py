@@ -100,7 +100,8 @@ class myui(form):
             return
         for path in self.paths:
             self.runthread(path[0],path[1]) #路径名，路径标识
-        self.q = que(self.threads)
+        t = int(self.selThread.currentText())
+        self.q = que(self.threads,t)
         self.q.start()
         self.q.exec()
 

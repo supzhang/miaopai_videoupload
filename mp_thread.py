@@ -44,6 +44,11 @@ class mp_thread(QThread):
                # print('init_upload', init_upload)
                 time.sleep(0.3)
                 self.statusChange(3,init_upload['msg'])
+                if init_upload['init_ok'] == 3:
+                    self.statusChange(2,init_upload['msg'])
+                    self.finsig.append(init_upload['init_ok'])
+                    self.finishSignal.emit([0,self.finsig])
+                    return
                 if init_upload['init_ok'] == 0: #初始化失败，重新上初始化
                     init_upload += 1
                     if init_upload_n < self.retry_times:
@@ -94,7 +99,7 @@ class mp_thread(QThread):
                             else:
                                 ftxt = '上传失败，重试超过限制次数，停止上传'
                                 self.finsig.append(ftxt)
-                                self.finishOkSignal.emit([0,self.finsig])
+                                self.finishOkSignal.emit(20)
                                 return
                         time.sleep(0.3)
                         coverTrans = self.coverTrans(checkVideoStatus['w'],checkVideoStatus['h'])
@@ -177,12 +182,17 @@ class mp_thread(QThread):
                 'init_ok':0,
                 'msg':msg,
                     }
-
-        token = res_json['data']['media_token']
-        self.scid = res_json['data']['scid']
-        self.key = res_json['data']['image_base64key']
-        self.image_key = res_json['data']['image_key']
-        self.media_key = res_json['data']['media_key']
+        if res_json['code'] == 200:
+            token = res_json['data']['media_token']
+            self.scid = res_json['data']['scid']
+            self.key = res_json['data']['image_base64key']
+            self.image_key = res_json['data']['image_key']
+            self.media_key = res_json['data']['media_key']
+        else:
+            return {
+                'init_ok':3,   #其他原因，直接上传失败，可能是超过次数
+                'msg':res_json['msg'],
+                    }
         ret = {
             'init_ok':1,
             'msg':'文件上传初始化成功！',
@@ -300,10 +310,10 @@ class mp_thread(QThread):
 
                 if msg == 'success':
                     check_ok = 1
-                    msg = self.file_name + '文件检验完成！'
+                    msg = '文件校验完成！'  #self.file_name +
                 else:
                     check_ok = 0
-                    msg = self.file_name + '文件检验失败！'
+                    msg =  '文件校验失败！'
                 ret = {
                     'check_ok':check_ok,
                     'msg':msg,
