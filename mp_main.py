@@ -22,20 +22,21 @@ class myui(form):
         super().__init__()
         ####################检测新版本########################
         version = '20171206'   #本软件版本
-        self.setWindowTitle('秒拍视频上传工具')
+        self.setWindowTitle('秒拍视频上传工具 ' + version + '  FROM zzy Q:1728570648 仅供测试，勿用于非法活动！')
         u = update(version)
-        u.hasNewVersion.connect(self.hasNew)
-        u.hasNewVersion.connect(self.hasNew)  #[是否有新版本,版本名,版本路径]
+        u.hasNewVersion.connect(self.hasNew)  # [是否有新版本,版本名,版本路径]
         u.start()
+
         #######################获取配置文件及解析配置，解析用户名密码################
         self.s1 = '==|=='  #用户之间的分割
         self.s2 = '=|='  #用户名密码的分割
+        self.isReg = 1  #初始化为已经注册
         self.conf = getConf() #
-        self.retList = self.unpack_users()
+        self.retList = self.unpack_users()   #获取已经保存的用户列表
         self.msgboxSignal.connect(self.messagebox)
-        self.btn_login.clicked.connect(self.login)
-        self.upload.clicked.connect(self.mutiThread)
-        #self.category.changeEvent().connect(self.writecat)
+        self.btn_login.clicked.connect(self.login)  #登陆功能
+        self.upload.clicked.connect(self.mutiThread)  #启动线程调度
+
         self.category.currentIndexChanged.connect(self.writecat)
         self.seldia.clicked.connect(self.getfilename)
         self.btn_hideuser.clicked.connect(self.hideUsers)
@@ -50,16 +51,14 @@ class myui(form):
         self.okTable.cellClicked.connect(self.video_play)
         self.btn_getusers.clicked.connect(self.get_userlist)
         self.txt_userlist.cellDoubleClicked.connect(self.adduser)
-        # self.okTable.  初始化上传前各按钮不可用
-        self.expire_time = 1516954276  #过期日
-        self.upload.setDisabled(True)
-        self.seldia.setDisabled(True)
-        self.btn_getlist.setDisabled(True)
-        self.btn_del.setDisabled(True)
-        self.threads = []
+        ###### self.okTable.  初始化上传前各按钮不可用
+        self.upload.setDisabled(True)  #上传禁用
+        self.seldia.setDisabled(True)  # 选择上传文件禁用
+        self.btn_getlist.setDisabled(True)  #获取用户列表禁用
+        self.btn_del.setDisabled(True)  #删除禁用
         self.hideuser = False #用户列表初始隐藏
         self.maxrows = 20 #视频列表最大数量
-        self.display_help = True #是否显示帮助
+        self.display_help = False #是否显示帮助
 
         self.table_status.setHorizontalHeaderLabels(['状态','标题','进度条','日志','用户名'])
         self.finishTable.setHorizontalHeaderLabels(['标题', '信息', '帐号','文件名'])
@@ -85,15 +84,15 @@ class myui(form):
                              '失败':QColor('red'),
                              '运行中':QColor('blue')
                              }
-        # if len(self.conf['user']) > 1:
-        #     self.txt_user.setText(self.conf['user'])
-        # if len(self.conf['pwd']) > 1:
-        #     self.txt_pass.setText(self.conf['pwd'])
+
         self.topics.setText(self.conf['topics'])
         self.custom_tag.setText(self.conf['custom_tag'])
+        self.threads = []
+
     def mutiThread(self): #选择多文件同时上传
-        if self.reg() == 0:
-            self.txtSignal.emit(['警告','本版本已经过期，请下载新版本使用:https://pan.baidu.com/s/1eRR2PSA'])
+        if self.isReg == 0:
+            QMessageBox.information(self, '提示', '此版本已经过期，请下载新版本使用！')
+            #self.txtSignal.emit(['警告','本版本已经过期，请下载新版本使用:https://pan.baidu.com/s/1eRR2PSA'])
             return
         self.upload.setDisabled(True)
         if len(self.paths) == 0:
@@ -137,11 +136,9 @@ class myui(form):
             self.btn_login.setDisabled(True)
             self.seldia.setDisabled(False)
             self.pack_users(self.phone,pwd)
-            # self.conf['user'] = self.phone
-            # self.conf['pwd'] = pwd
-            # writeConf(self.conf)
 
 
+    ####选择需要上传的文件#####
     def getfilename(self):
         try:
             if os.path.exists(self.conf['video_path']):
@@ -210,7 +207,8 @@ class myui(form):
             return
         self.conf['user_list_path'] = os.path.dirname(file[0])
         writeConf(self.conf)
-        self.hideUsers()
+        if self.hideuser == False:
+            self.hideUsers()
         with open(file[0],'r',errors = 'ignore') as f:
             lines = f.readlines()
             n = 0
@@ -311,6 +309,8 @@ class myui(form):
                     self.table_status.setItem(threadno,col,item)
                     if status == '失败':
                         self.table_status.item(threadno, 0).setBackground(self.status_color['失败'])
+                    #threadNoItem = QTableWidgetItem(str(threadno))
+                    #self.table_status.setItem(threadno, col, item)
                 col += 1
             self.table_status.item(threadno, 1).setToolTip(ftitle_)
             if titleok == False:
@@ -379,17 +379,6 @@ class myui(form):
             if status in ['运行中','等待']:
                 item = QTableWidgetItem('终止')
                 self.table_status.setItem(x,0,item)
-    def reg(self): #过期时间函数
-        try:
-            res = requests.head('http://www.baidu.com',timeout = 2)
-            h  = res.headers['Date']
-            t  = int(time.mktime(time.strptime(h[5:25], "%d %b %Y %H:%M:%S")))
-        except:
-            t = time.time() + time.timezone
-        if t > self.expire_time:
-            return 0
-        else:
-            return 1
     def getList(self,no): #获取视频列表
             
         try:
@@ -503,6 +492,7 @@ class myui(form):
         self.usersCount += 1
         self.txt_pass.setText(pwd)
         self.login()
+    #####更新目前各上传线程的状态##############
     def statusChangem(self,info):#线程序号，状态，实时状态，提示
         threadno = info[0]
         status = info[1]
@@ -510,28 +500,27 @@ class myui(form):
         tips = info[3]
         item_status = QTableWidgetItem(status)
         self.table_status.setItem(threadno,0,item_status)
-
         self.table_status.item(threadno,0).setBackground(self.status_color[status])
-
         item_current_status = QTableWidgetItem(current_status)
         self.table_status.setItem(threadno,3, item_current_status)
         self.table_status.item(threadno,3).setToolTip(tips)
-
-
-
+    ######删除已经上传的视频#######
     def del_status(self):
         row = self.table_status.currentRow()
         self.table_status.removeRow(row)
+    #####获取视频列表的按钮不可用开关######
     def getlist_disable(self,d):
         if d ==1:
             self.btn_getlist.setDisabled(True)
         else:
             self.btn_getlist.setDisabled(False)
+    #####弹窗API，msg = [标题,信息],只有OK按钮
     def messagebox(self,msg):
         try:
             QMessageBox.information(self,msg[0],msg[1])
         except Exception as e:
             print(e)
+    ####将读取的默认记录写入界面####
     def writecat(self,index):
         self.conf['sort_index'] = str(index)
         writeConf(self.conf)
@@ -546,31 +535,11 @@ class myui(form):
             self.txt_userlist.setVisible(False)
             self.hideuser = False
             self.btn_hideuser.setText('显示用户栏')
-    def readHelp(self):
-        path = os.getcwd()
-        name = path + r'\\readme.html'
-        if os.path.exists(name):
-            with open(name,'r') as f:
-                html = f.read()
-        else:
-            html = '未找到帮助文件'
-        self.okTable_over.setText(html)
-    def help(self):
-        if  self.display_help == True:
-            self.lab_help.setText('<a href="#"><img src="image/help.ico"/>帮助<a/>')
-            self.okTable_over.setVisible(False)
-            self.display_help = False
-        else:
-            self.lab_help.setText('<a href="#"><img src="image/help.ico"/>关闭帮助<a/>')
-            self.okTable_over.setVisible(True)
 
-            self.display_help = True
     def unpack_users(self):
         retlist = []
         self.usersCount = 0
-
         users = self.conf['user']
-
         users_list = users.split(self.s1) if self.s1 in users else [users]
         for user in users_list:
             if self.s2 in user:
@@ -588,7 +557,6 @@ class myui(form):
         return retlist
     def pack_users(self,user,pwd):
         hasUser = 0
-        print('retlist',self.retList)
         for x in self.retList:
             if user == x[0]:
                 hasUser = 1
@@ -605,11 +573,19 @@ class myui(form):
                 pwd = user[1]
         self.txt_pass.setText(pwd)
 
-    def hasNew(self,info):#[是否有新版本,版本名,版本路径]
+    def hasNew(self,info):#[是否有新版本,版本名,版本路径,是否过期]
+        print(info)
         if info[0] == 1:
             t = QMessageBox.information(self,'提醒','已经有新版本' + info[1] + '\n，是否下载？',QMessageBox.Yes|QMessageBox.No,QMessageBox.Yes)
             if t == QMessageBox.Yes:
                 webbrowser.open(info[2])
+        try:
+            if info[3] == 0: #检查是版本是否过期
+                self.isReg = 0
+                #QMessageBox.information(self,'提示','此版本已经过期，请下载新版本使用！')
+        except Exception as e:
+            print(e)
+
 
 
 if __name__ == '__main__':

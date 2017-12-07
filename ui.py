@@ -8,6 +8,7 @@ import os
 class form(QWidget):
     def __init__(self):
         super().__init__()
+        self.display_help = True
         self.setupUI()
     def setupUI(self):
 
@@ -60,7 +61,7 @@ class form(QWidget):
         self.txt_userlist.setToolTip('双击停止正在进行的上传，也可直接登陆')
         self.txt_info = QTextEdit('',self)
         self.txt_info.setVisible(False)
-        self.table_status = QTableWidget(0,5) #状态【成功、失败、未开始、运行中、等待】，标题，，进度条，实时状态，用户名，
+        self.table_status = QTableWidget(0,6) #状态【成功、失败、未开始、运行中、等待】，标题，，进度条，实时状态，用户名，线程标识
         self.table_status.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.table_status.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.table_status.setAlternatingRowColors(True)
@@ -70,6 +71,7 @@ class form(QWidget):
         self.table_status.horizontalHeader().setSectionResizeMode(1,QHeaderView.ResizeToContents)
 
         self.table_status.setColumnHidden(2,True)
+        self.table_status.setColumnHidden(5,True)
         self.btn_login = QPushButton('登陆', self)
         self.btn_login.setFixedWidth(80)
         self.btn_getusers = QPushButton('载入用户列表',self)
@@ -224,14 +226,26 @@ class form(QWidget):
 
         self.setLayout(self.mainv)
         self.show()
-    def gethelp(self):
+        self.help() #加载帮助文件
+    def readHelp(self):
         path = os.getcwd()
-        helpname = path + r'\\readme.html'
-        if not os.path.exists(helpname):
-            return ''
-        with open(helpname,'r') as f:
-            help = f.read()
-            return help
+        name = path + r'\\readme.html'
+        if os.path.exists(name):
+            with open(name,'r') as f:
+                html = f.read()
+        else:
+            html = '未找到帮助文件'
+        self.okTable_over.setText(html)
+    def help(self):
+        if  self.display_help == True:
+            self.lab_help.setText('<a href="#"><img src="image/help.ico"/>帮助<a/>')
+            self.okTable_over.setVisible(False)
+            self.display_help = False
+        else:
+            self.lab_help.setText('<a href="#"><img src="image/help.ico"/>关闭帮助<a/>')
+            self.okTable_over.setVisible(True)
+
+            self.display_help = True
 class user_info(QDialog):
     def __init__(self,sess):
         super().__init__()
