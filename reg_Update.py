@@ -8,12 +8,15 @@ class update(QThread):
     hasNewVersion = pyqtSignal(list)
     def __init__(self,version):
         super().__init__()
+
         t = '20180107'
         self.expire_time = int(time.mktime(time.strptime(t, "%Y%m%d")))  #过期日1516954276
         version_s = int(time.mktime(time.strptime(version, "%Y%m%d")))
         self.version = version_s
     def run(self):
+        time.sleep(1)
         self.update()
+
     def update(self):
         try:
             weburl = 'https://pan.baidu.com/s/1eRR2PSA#list/path=%2F%E5%85%B1%E4%BA%AB'

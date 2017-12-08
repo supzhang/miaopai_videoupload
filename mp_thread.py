@@ -578,14 +578,12 @@ class loginThread(QThread):   #登陆线程，防止登陆时卡死
 
     def __init__(self, sess,ui,url, headers, data, conf,parent=None):
         super(loginThread, self).__init__(parent)
-
         self.sess = sess
         self.ui = ui
         self.headers = headers
         self.data = data
         self.conf = conf
         self.url = url
-
 
     def run(self):
         try:

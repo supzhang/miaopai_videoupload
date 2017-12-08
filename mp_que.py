@@ -12,23 +12,27 @@ class que(QThread):
 
 
     def run(self):
+
         while True:
             current_t = 0
             for tt in self.threads:
-                if not tt[0].isFinished():
-                    current_t += 1
-                    if current_t <= self.maxthread:
-                        tt[0].start()
+                if not tt[0].isFinished():  #检测是否完成
+                    print('正在运行的线程1：', current_t)
+                    if current_t < self.maxthread:  #检测是否最大线程
+                        if not tt[0].isRunning():  #检测是否在运行
+                           # print('启动',tt[1],'current',current_t,'maxthread',self.maxthread)
+                            current_t += 1
+                            tt[0].start()
+                            current_t += 1
+                            continue
 
                 else:
                     tt[0].terminate()
                     tt[0].exit()
-                    #print('-------',tt)
                     self.threads.remove(tt)
-            if current_t == 0:
-                self.exit()
+            #不关闭线程调度，一直等待新的线程进入。
             time.sleep(3)
-                    
-
-
+            print('调度器等待——————————————————————')
+            print('线程总数',len(self.threads))
+            print('正在运行的线程：', current_t)
         pass

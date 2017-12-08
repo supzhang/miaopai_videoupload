@@ -2,7 +2,7 @@
 #打包命令nuitka --windows-disable-console --recurse-all --output-dir=D:\output --python-version=3.6 --icon=image\ico.ico mp_main.py
 from PyQt5.QtWidgets import QApplication,QFileDialog,QTableWidgetItem,QLabel,QMessageBox
 
-from PyQt5.QtCore import pyqtSignal,Qt,QTextCodec
+from PyQt5.QtCore import pyqtSignal,Qt,QTextCodec,QModelIndex
 from mp_que import que
 from get_conf import getConf,writeConf
 from reg_Update import update
@@ -24,9 +24,9 @@ class myui(form):
         version = '20171206'   #本软件版本
         self.setWindowTitle('秒拍视频上传工具 ' + version + '  FROM zzy Q:1728570648 仅供测试，勿用于非法活动！')
         u = update(version)
-        u.hasNewVersion.connect(self.hasNew)  # [是否有新版本,版本名,版本路径]
+        u.hasNewVersion.connect(self.hasNewVer)  # [是否有新版本,版本名,版本路径]
+        #print(self.hasNewVer)
         u.start()
-
         #######################获取配置文件及解析配置，解析用户名密码################
         self.s1 = '==|=='  #用户之间的分割
         self.s2 = '=|='  #用户名密码的分割
@@ -36,6 +36,7 @@ class myui(form):
         self.msgboxSignal.connect(self.messagebox)
         self.btn_login.clicked.connect(self.login)  #登陆功能
         self.upload.clicked.connect(self.mutiThread)  #启动线程调度
+        self.btn_stopThread.clicked.connect(self.getStatusTableThreads)
 
         self.category.currentIndexChanged.connect(self.writecat)
         self.seldia.clicked.connect(self.getfilename)
@@ -47,6 +48,7 @@ class myui(form):
         self.deleteSignal.connect(self.deleteVideo)
         self.lab_help.linkActivated.connect(self.help)
         self.txt_user.currentTextChanged.connect(self.userChange)
+        self.selThread.
         #self.picTipSignal.connect(self.picTip)
         self.okTable.cellClicked.connect(self.video_play)
         self.btn_getusers.clicked.connect(self.get_userlist)
@@ -78,6 +80,7 @@ class myui(form):
         # self.txt_pass.setText('caolei2121')
         self.readHelp()  #读取帮助文件
         self.isLogin = False
+
         self.txt_info.setReadOnly(True)
         self.threadno = 0 #线程号 传递到子线程，返回数据时需要提供
         self.status_color = {'成功':QColor('green'),
@@ -87,8 +90,10 @@ class myui(form):
 
         self.topics.setText(self.conf['topics'])
         self.custom_tag.setText(self.conf['custom_tag'])
-        self.threads = []  #存储线程变量  [[thread1,tag],[thread2,tag]]
 
+        #####线程控制#######
+        self.threads = []  #存储线程变量  [[thread1,tag],[thread2,tag]]
+        self.isFirstThreads = True   ##保证系统中只有一个调度线程
     def mutiThread(self): #选择多文件同时上传
         if self.isReg == 0:
             QMessageBox.information(self, '提示', '此版本已经过期，请下载新版本使用！')
@@ -100,17 +105,22 @@ class myui(form):
         for path in self.paths:
             self.runthread(path[0],path[1]) #路径名，路径标识
         maxThread = int(self.selThread.currentText())  #获取最大线程数
-        self.q = que(self.threads,maxThread)
-        self.q.start()
-        self.q.exec()
+        if self.isFirstThreads == True:  #如果是第一次启动调度器，传输所有线程
+            self.q = que(self.threads,maxThread)
+            self.q.start()
+            self.isFirstThreads = False
+            self.q.isInterruptionRequested()
+            self.q.exec()
 
+        else:
+            self.q.threads = self.threads
     def login(self):
        #登陆的请求线程
         if self.isLogin == 1:
             self.btn_login.setText('登陆')
             self.seldia.setDisabled(True)
             self.upload.setDisabled(True)
-            self.shutThread()
+            self.shutThread(0)  #退出则关闭所有上传线程
             self.btn_del.setDisabled(True)
             self.btn_getlist.setDisabled(True)
             del self.sess
@@ -243,6 +253,7 @@ class myui(form):
         tip = t + '\t' + self.phone + '\t' + txt
         self.txt_info.append(tip)
     def runthread (self,path,threadno):
+        #self.newThreads = [] ##初始化新增加的线程变量
 
         try:
             file_name = os.path.basename(path)
@@ -320,7 +331,10 @@ class myui(form):
             self.t.finishOkSignal.connect(self.getList)
             self.t.statusSignal.connect(self.statusChangem)
             self.t.setTerminationEnabled(True)
-            self.threads.append([self.t,threadno])
+            v = [self.t,threadno] #线程，线程标识
+            self.threads.append(v)
+            # if self.isFirstThreads == False:
+            #     self.newThreads.append(v)
 
         except Exception as e:
             print(e)
@@ -358,15 +372,25 @@ class myui(form):
                     self.txt_userlist.setItem(l, 1, item)
                     break
             
-    def shutThread(self):
+    def shutThread(self,flags):  #控制所有线程的关闭(单线程关闭使用线程列表[线程1,线程2,线程3.....],，所有关闭使用 0
         closedTrhead = 0
-        try:
-            self.q.terminate() #关闭调度线程
-        except:
-            pass
-        for t in self.threads:
+        if flags == 0:
+            try:
+                self.q.terminate() #关闭调度线程
+                needShuts = self.threads
+            except:
+                needShuts = self.threads
+                pass
+        else:
+            needShuts = flags
+        if len(needShuts) == 0:
+            return
+
+        for t in needShuts:
             try:
                 t[0].terminate()
+                print('停止',t[1])
+                self.threads.remove(t)
                 closedTrhead += 1
             except:
                 pass
@@ -489,6 +513,8 @@ class myui(form):
         self.txt_user.setCurrentIndex(self.usersCount)
         self.usersCount += 1
         self.txt_pass.setText(pwd)
+        if self.isLogin == 1:   #如果已经登陆，先退出
+            self.login()
         self.login()
     #####更新目前各上传线程的状态##############
     def statusChangem(self,info):#线程序号，状态，实时状态，提示
@@ -571,7 +597,7 @@ class myui(form):
                 pwd = user[1]
         self.txt_pass.setText(pwd)
 
-    def hasNew(self,info):#[是否有新版本,版本名,版本路径,是否过期]
+    def hasNewVer(self,info):#[是否有新版本,版本名,版本路径,是否过期]
         print(info)
         if info[0] == 1:
             t = QMessageBox.information(self,'提醒','已经有新版本' + info[1] + '\n，是否下载？',QMessageBox.Yes|QMessageBox.No,QMessageBox.Yes)
@@ -583,6 +609,38 @@ class myui(form):
                 #QMessageBox.information(self,'提示','此版本已经过期，请下载新版本使用！')
         except Exception as e:
             print(e)
+    def getStatusTableThreads(self):
+        threadTags = set() #暂存 需要关闭线程的标识
+        neetStopThreads = []
+        indexs = self.table_status.selectedIndexes()
+        indexsLen = len(indexs)
+        try:
+            if indexsLen == 0:
+                self.msgboxSignal.emit(['提醒','请先选择需要停止的线程'])
+            elif len(self.threads) == 0:
+                self.msgboxSignal.emit(['提醒','没有运行的线程'])
+            else:
+                for currentIndex in indexs:  #遍历所选行的线程标识，
+                    row = self.table_status.itemFromIndex(currentIndex).row()
+                    itemInt = int(self.table_status.item(row,5).text())
+                    threadTags.add(itemInt)
+                if len(threadTags) == 0:
+                    self.msgboxSignal(['提醒','您选择的文件均未开始运行'])
+                    return
+                for x in self.threads:  #查找每个标识对应的线程
+                    #print(x[1],threadTags)
+                    if x[1] in threadTags:
+                        neetStopThreads.append(x)
+                        break
+
+                self.shutThread(neetStopThreads)
+        except Exception as e:
+            print(e)
+
+
+
+
+
 
 
 

@@ -100,6 +100,8 @@ class form(QWidget):
         self.hasad = QCheckBox('含有广告',self)
         self.orintal = QCheckBox('原创内容',self)
         self.serial = QCheckBox('连载内容',self)
+        self.btn_stopThread = QPushButton('停止',self)
+        self.btn_stopAllThread = QPushButton('停止所有',self)
         self.lab_selThread = QLabel('线程数：',self)
         self.lab_selThread.setFixedWidth(50)
         self.selThread = QComboBox()
@@ -191,6 +193,9 @@ class form(QWidget):
         hbox6.addWidget(self.hasad)
         hbox6.addWidget(self.orintal)
         hbox6.addWidget(self.serial)
+        hbox6.addWidget(self.btn_stopThread)
+        hbox6.addWidget(self.btn_stopAllThread)
+
         hbox6.addWidget(self.lab_selThread)
         hbox6.addWidget(self.selThread)
 
