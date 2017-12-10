@@ -15,16 +15,27 @@ class que(QThread):
 
         while True:
             current_t = 0
+            print('进入循环，current_t',current_t)
             for tt in self.threads:
+                #print('线程停止吗？',tt[0].isFinished())
                 if not tt[0].isFinished():  #检测是否完成
-                    print('正在运行的线程1：', current_t)
+                    #print('正在运行的线程1：', current_t)
                     if current_t < self.maxthread:  #检测是否最大线程
-                        if not tt[0].isRunning():  #检测是否在运行
-                           # print('启动',tt[1],'current',current_t,'maxthread',self.maxthread)
+                        if tt[0].isRunning():  #检测是否在运行
+                            current_t +=1
+                            pass
+                        else:
+                            #print('启动',tt[1],'current',current_t,'maxthread',self.maxthread)
                             current_t += 1
                             tt[0].start()
                             current_t += 1
                             continue
+                        # if not tt[0].isRunning():  #检测是否在运行
+                        #     print('启动',tt[1],'current',current_t,'maxthread',self.maxthread)
+                        #     current_t += 1
+                        #     tt[0].start()
+                        #     current_t += 1
+                        #     continue
 
                 else:
                     tt[0].terminate()

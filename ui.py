@@ -102,6 +102,7 @@ class form(QWidget):
         self.serial = QCheckBox('连载内容',self)
         self.btn_stopThread = QPushButton('停止',self)
         self.btn_stopAllThread = QPushButton('停止所有',self)
+        self.btn_stopAllThread.setVisible(False)
         self.lab_selThread = QLabel('线程数：',self)
         self.lab_selThread.setFixedWidth(50)
         self.selThread = QComboBox()

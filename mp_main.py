@@ -21,11 +21,10 @@ class myui(form):
     def __init__(self):
         super().__init__()
         ####################检测新版本########################
-        version = '20171206'   #本软件版本
+        version = '20171209'   #本软件版本
         self.setWindowTitle('秒拍视频上传工具 ' + version + '  FROM zzy Q:1728570648 仅供测试，勿用于非法活动！')
         u = update(version)
         u.hasNewVersion.connect(self.hasNewVer)  # [是否有新版本,版本名,版本路径]
-        #print(self.hasNewVer)
         u.start()
         #######################获取配置文件及解析配置，解析用户名密码################
         self.s1 = '==|=='  #用户之间的分割
@@ -48,7 +47,7 @@ class myui(form):
         self.deleteSignal.connect(self.deleteVideo)
         self.lab_help.linkActivated.connect(self.help)
         self.txt_user.currentTextChanged.connect(self.userChange)
-        self.selThread.
+        self.selThread.currentIndexChanged.connect(self.selThreadChange)
         #self.picTipSignal.connect(self.picTip)
         self.okTable.cellClicked.connect(self.video_play)
         self.btn_getusers.clicked.connect(self.get_userlist)
@@ -109,7 +108,7 @@ class myui(form):
             self.q = que(self.threads,maxThread)
             self.q.start()
             self.isFirstThreads = False
-            self.q.isInterruptionRequested()
+
             self.q.exec()
 
         else:
@@ -377,7 +376,11 @@ class myui(form):
         if flags == 0:
             try:
                 self.q.terminate() #关闭调度线程
+                self.q.exit()
+
                 needShuts = self.threads
+                self.isFirstThreads = True
+                print('关闭调度---------------------')
             except:
                 needShuts = self.threads
                 pass
@@ -385,23 +388,33 @@ class myui(form):
             needShuts = flags
         if len(needShuts) == 0:
             return
-
+        l = self.table_status.rowCount()
+        print(len(needShuts))
         for t in needShuts:
             try:
+
+                for x in range(l):
+                    status = self.table_status.item(x, 0).text()
+                    threadTag = int(self.table_status.item(x, 5).text())
+                    if t[1] == threadTag:
+                        item = QTableWidgetItem('终止')
+                        self.table_status.setItem(x, 0, item)
+                        break
                 t[0].terminate()
-                print('停止',t[1])
-                self.threads.remove(t)
+                t[0].exit()
                 closedTrhead += 1
-            except:
+            except Exception as e:
+                print(e)
                 pass
+
+        for tt in needShuts:
+            self.threads.remove(tt)
+
         if closedTrhead > 0:
             self.txtSignal.emit(['提示','共有 ' + str(closedTrhead) + '个任务已经被停止'])
-        l = self.table_status.rowCount()
-        for x in range(l):
-            status = self.table_status.item(x,0).text()
-            if status in ['运行中','等待']:
-                item = QTableWidgetItem('终止')
-                self.table_status.setItem(x,0,item)
+
+
+
     def getList(self,no): #获取视频列表
         try:
             time.sleep(1)
@@ -636,6 +649,14 @@ class myui(form):
                 self.shutThread(neetStopThreads)
         except Exception as e:
             print(e)
+
+    def selThreadChange(self,index):
+        try:
+            self.q.maxthread = index + 1
+            print('sesstion has been changed to ' ,self.q.maxthread)
+        except Exception as e:
+            print(e)
+
 
 
 

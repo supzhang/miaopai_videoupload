@@ -106,7 +106,7 @@ class mp_thread(QThread):
                         time.sleep(0.3)
                         videoTransNew = self.videoTransNew(checkVideoStatus['w'],checkVideoStatus['h'])
 
-                        self.statusChange(3,'正在获取封面,60秒内无法获取将停止...')
+                        self.statusChange(3,'正在获取封面,6分钟内无法获取将停止...')
 
                         getCovers = self.getCovers()
                         print(getCovers)
@@ -120,7 +120,7 @@ class mp_thread(QThread):
                             return
                         elif getCovers['getcover_ok'] == 2:
                             try:
-                                self.statusChange(2,'发现与视频文件同名图片，使用此图片做为封面！')
+                                self.statusChange(2,'发现视频文件同名图片，使用此图做为封面！')
                             except Exception as e:
                                 print(e)
                             upload_res = self.UploadCoverimage(getCovers['image'])
@@ -417,7 +417,7 @@ class mp_thread(QThread):
         data = {
             'scid':self.scid,
         }
-        while t < 80:
+        while t < 360:
             t += 1
             try:
                 cover_res = self.sess.post(url_api,headers = self.headers,data = data)
@@ -441,7 +441,7 @@ class mp_thread(QThread):
                     else:
                         getcover_ok = 0
                         msg = '未获取到封面图片！'
-                        time.sleep(0.6)
+                        time.sleep(0.9)
             except Exception as e:
                  getcover_ok = 0
                  msg = '封面数据请求故障！'
