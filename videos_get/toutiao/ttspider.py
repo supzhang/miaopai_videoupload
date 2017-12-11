@@ -94,4 +94,17 @@ t.exec()
 # url = 'https://ib.365yg.com/video/urls/v/1/toutiao/mp4/c0d0bbbcc22d48b4ae4327a35198a184?r=%s&s=%s'%(r,s)
 # res = requests.get(url)
 # print(res.json())
-
+# categories = {'搞笑':'subv_funny',
+#               '音乐':'subv_voice',
+#               '推荐':'video_new',
+#               '开眼':'subv_broaden_view',
+#               '原创':'subv_boutique',
+#               '游戏':'subv_game',
+#               '呆盟':'subv_cute',
+#               '娱乐':'subv_entertainment',
+#               '影视':'subv_movie',
+#               '生活':'subv_life',
+#               '小品':'subv_comedy',
+#               '社会':'subv_society',
+#               }
+# hotvideo_url = 'https://www.ixigua.com/api/pc/hot_video/'  #热视频
