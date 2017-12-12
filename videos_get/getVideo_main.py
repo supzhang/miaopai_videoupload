@@ -12,7 +12,7 @@ class video_main(Ui_getVideoUi):
         self.setupUi(self.getVideoUi)
         self.getVideoUi.show()
         self.table_videos.setColumnCount(5)
-        self.table_videos.setHorizontalHeaderLabels(['来源','浏览量','下载地址','check'])
+        self.table_videos.setHorizontalHeaderLabels(['选择','来源','浏览量','下载地址','check'])
         self.btn_getvideo.clicked.connect(self.getVideo)
         self.btn_selectSavePath.clicked.connect(self.selectPath)
         self.btn_download.clicked.connect(self.downloadVideo)
@@ -67,20 +67,26 @@ class video_main(Ui_getVideoUi):
                 print(e)
         return checkedCat
     def addrows(self,row):
-        print('---------',row)
+       # print('---------',row)
         colno = 1
         rowsno = self.table_videos.rowCount()
         self.table_videos.setRowCount(rowsno + 1)
-        title = row['title']
-        url = row['video_url']
-        count = row['video_play_count']
-        check = ' '
-        heads = [title,count,url,check]
-        for head in headers:
-            item = QTableWidgetItem(head)
-            self.table_videos.setItem(rowsno + 1,colno)
-            colno += 1
+        check_widget = QtWidgets.QCheckBox()
+        self.table_videos.setCellWidget(rowno,0,check_widget)
+        try:
 
+            title = row['title']
+            url = row['video_url']
+            count = row['video_play_count']
+            check = ' '
+            heads = [title,count,url,check]
+            print(heads)
+            for head in heads:
+                item = QTableWidgetItem(str(head))
+                self.table_videos.setItem(rowsno,colno,item)
+                colno += 1
+        except Exception as e:
+            print(e)
 
 
 

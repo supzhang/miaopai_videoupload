@@ -71,7 +71,7 @@ class ttspider(QThread):
                 final = self.get_video_url(ret1)
                 self.ret = final
                 self.finalInfo.emit(final)
-                print(final)
+                print('aaaaaaaaaa',final)
 
             except Exception as e:
                 print(e)
@@ -99,7 +99,7 @@ class ttspider(QThread):
         videolist = url_json['data']['video_list']
         keys = list(videolist.keys())
         videoinfo = videolist[keys[-1:][0]]
-        url = str(base64.b64decode(videoinfo['main_url']))
+        url = base64.b64decode(videoinfo['main_url']).decode('utf-8')
 
         ret = {
                     'video_url' : url,
