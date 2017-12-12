@@ -1,6 +1,6 @@
 from videos_get.Ui_getVideoUi import Ui_getVideoUi
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QTableWidgetItem
+from PyQt5.QtWidgets import QTableWidgetItem,QFileDialog
 from PyQt5.QtCore import pyqtSignal
 from videos_get.toutiao.ttspider import ttspider
 import sys
@@ -13,6 +13,12 @@ class video_main(Ui_getVideoUi):
         self.getVideoUi.show()
         self.table_videos.setColumnCount(5)
         self.table_videos.setHorizontalHeaderLabels(['选择','来源','浏览量','下载地址','check'])
+        self.table_videos.setColumnWidth(0,40)
+        self.table_videos.setColumnWidth(1,300)
+        self.table_videos.setColumnWidth(2,60)
+        self.table_videos.setColumnWidth(3,400)
+        self.table_videos.setColumnHidden(4,True)
+
         self.btn_getvideo.clicked.connect(self.getVideo)
         self.btn_selectSavePath.clicked.connect(self.selectPath)
         self.btn_download.clicked.connect(self.downloadVideo)
@@ -44,9 +50,20 @@ class video_main(Ui_getVideoUi):
             thread.start()
 
     def selectPath(self): #获取视频存放位置
-        pass
+        try:
+            path = r'c:\\'
+            path = QFileDialog.getExistingDirectory(self.getVideoUi,
+                                                "请选择文件夹",
+                                               )
+            self.line_videoSave.setText(path)
+        except Exception as e:
+            print(e)
 
-    def downloadVideo(self):
+    def downloadVideo(self,url,filename):
+        res = requests.get(url)
+        content = res.content
+        with open(filename,'wb') as f:
+            f.write(content)
         pass
     def getCheckCat(self):
         checkedCat = []
@@ -67,12 +84,15 @@ class video_main(Ui_getVideoUi):
                 print(e)
         return checkedCat
     def addrows(self,row):
-       # print('---------',row)
+        print('---------',row)
         colno = 1
         rowsno = self.table_videos.rowCount()
         self.table_videos.setRowCount(rowsno + 1)
-        check_widget = QtWidgets.QCheckBox()
-        self.table_videos.setCellWidget(rowno,0,check_widget)
+        try:
+            check_widget = QtWidgets.QCheckBox()
+            self.table_videos.setCellWidget(rowsno,0,check_widget)
+        except Exception as e:
+            print(e)
         try:
 
             title = row['title']

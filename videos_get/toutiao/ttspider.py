@@ -71,7 +71,7 @@ class ttspider(QThread):
                 final = self.get_video_url(ret1)
                 self.ret = final
                 self.finalInfo.emit(final)
-                print('aaaaaaaaaa',final)
+               # print('aaaaaaaaaa',final)
 
             except Exception as e:
                 print(e)
