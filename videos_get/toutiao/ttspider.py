@@ -4,12 +4,17 @@
 import requests
 import re
 import time
-from PyQt5.QtCore import QThread
+import random
+import binascii
+import base64
+from PyQt5.QtCore import QThread,pyqtSignal
+
 #mediaurl = https://www.ixigua.com/a6464842031897248269/#mid=58363379363
 #https://www.ixigua.com/group/6483718332703834638/
 #https://www.ixigua.com/c/user/58363379363/
 #https://www.ixigua.com/item/6497799282349834765/
 class ttspider(QThread):
+    finalInfo = pyqtSignal(dict)
     def __init__(self,category,maxcount):  #需要获取的分类
         super().__init__()
         self.category = category
@@ -37,7 +42,7 @@ class ttspider(QThread):
             maxmin = 'max_behot_time=' + self.max_behot_time
         url = 'https://www.ixigua.com/api/pc/feed/?' + maxmin + '&category=' + self.category
         try:
-            res = self.sess.get(url, headers=self.headers)
+            res = self.sess.get(url, headers=self.headers,verify = False)
             json = res.json()
             data = json['data']
             l = len(data)
@@ -62,15 +67,57 @@ class ttspider(QThread):
                 'avatar_url':d['image_url'],
                 'video_id':d['video_id'],
             }
-            print(ret1)
+            try:
+                final = self.get_video_url(ret1)
+                self.ret = final
+                self.finalInfo.emit(final)
+                print(final)
 
-            #break
+            except Exception as e:
+                print(e)
+
+    def get_video_url(self,info):
+        r = str(random.random())[2:]
+        #r = '28753395491314815'
+        r_1 = ('/video/urls/v/1/toutiao/mp4/' + info['video_id'] + '?r=' + r)
+        r_bin  =r_1.encode('utf-8')
+        s = binascii.crc32(r_bin)
+        s = self.right_shift(s,0)
+        url = 'https://ib.365yg.com'+ r_1 + '&s=' + str(s)
+        try:
+            real_urls = self.get_url_real_url(url)
+            info['video_url'] = real_urls['video_url']
+            info['video_type'] = real_urls['video_type']
+            info['video_def'] = real_urls['video_def']
+        except Exception as e:
+            print('获取视频真实地址：',e)
+        return info
+    def get_url_real_url(self,url):   #获取真实视频地址
+
+        res = requests.get(url,headers = self.headers,verify = False)
+        url_json = res.json()
+        videolist = url_json['data']['video_list']
+        keys = list(videolist.keys())
+        videoinfo = videolist[keys[-1:][0]]
+        url = str(base64.b64decode(videoinfo['main_url']))
+
+        ret = {
+                    'video_url' : url,
+                    'video_type' : videoinfo['vtype'],
+                    'video_def' : videoinfo['definition'],
+                }
+        return ret
+
+    ##获取右移后的数据
+    def right_shift(self,val, n):
+        return val >> n if val >= 0 else (val + 0x100000000) >> n
 
 
-t = ttspider('subv_entertainment',20)
 
-t.start()
-t.exec()
+# t = ttspider('subv_entertainment',5)
+#
+# t.start()
+# t.exec()
 
 
 
