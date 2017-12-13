@@ -2,6 +2,7 @@
 
 from PyQt5.QtWidgets import QDialog, QHBoxLayout,QVBoxLayout,QPushButton,QLineEdit,QTextEdit,QLabel,QComboBox,QCheckBox,QTableWidget,QWidget,QAbstractItemView,QHeaderView
 from PyQt5.QtGui import QIcon,QPixmap
+
 import os
 
 
@@ -82,6 +83,7 @@ class form(QWidget):
         self.seldia = QPushButton('选择上传文件',self)
         self.seldia.setFixedWidth(100)
         self.txt_path = QLabel('',self)
+        self.btn_getVideo= QPushButton('一键下载网上视频',self)
 
         self.txt_ftitle = QLabel('视频标题：',self)
         self.ftitle = QLineEdit('',self)
@@ -216,8 +218,11 @@ class form(QWidget):
         self.resize(1100,600)
         hbox_path.addWidget(self.seldia)
         hbox_path.addWidget(self.txt_path)
+        hbox_path.addWidget(self.btn_getVideo)
+
         hbox_path.setStretchFactor(self.seldia,4)
         hbox_path.setStretchFactor(self.txt_path,7)
+        hbox_path.setStretchFactor(self.btn_getVideo,4)
 
         vbox_loginfo.addLayout(hbox_loginfo)
         vbox_loginfo.addLayout(hbox_path)

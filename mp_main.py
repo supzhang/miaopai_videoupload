@@ -3,6 +3,7 @@
 from PyQt5.QtWidgets import QApplication,QFileDialog,QTableWidgetItem,QLabel,QMessageBox
 
 from PyQt5.QtCore import pyqtSignal,Qt,QTextCodec,QModelIndex
+from videos_get.getVideo_main import video_main  #单独的网上视频获取器
 from mp_que import que
 from get_conf import getConf,writeConf
 from reg_Update import update
@@ -21,7 +22,7 @@ class myui(form):
     def __init__(self):
         super().__init__()
         ####################检测新版本########################
-        version = '20171209'   #本软件版本
+        version = '20171213'   #本软件版本
         self.setWindowTitle('秒拍视频上传工具 ' + version + '  FROM zzy Q:1728570648 仅供测试，勿用于非法活动！')
         u = update(version)
         u.hasNewVersion.connect(self.hasNewVer)  # [是否有新版本,版本名,版本路径]
@@ -31,6 +32,7 @@ class myui(form):
         self.s2 = '=|='  #用户名密码的分割
         self.isReg = 1  #初始化为已经注册
         self.conf = getConf() #
+        self.conf.update({'version':version})
         self.retList = self.unpack_users()   #获取已经保存的用户列表
         self.msgboxSignal.connect(self.messagebox)
         self.btn_login.clicked.connect(self.login)  #登陆功能
@@ -48,6 +50,7 @@ class myui(form):
         self.lab_help.linkActivated.connect(self.help)
         self.txt_user.currentTextChanged.connect(self.userChange)
         self.selThread.currentIndexChanged.connect(self.selThreadChange)
+        self.btn_getVideo.clicked.connect(self.getVideo)
         #self.picTipSignal.connect(self.picTip)
         self.okTable.cellClicked.connect(self.video_play)
         self.btn_getusers.clicked.connect(self.get_userlist)
@@ -650,10 +653,18 @@ class myui(form):
         except Exception as e:
             print(e)
 
-    def selThreadChange(self,index):
+    def selThreadChange(self,index):  #线程数量改动时更改已经设置的线程数
         try:
             self.q.maxthread = index + 1
             print('sesstion has been changed to ' ,self.q.maxthread)
+        except Exception as e:
+            print(e)
+
+    def getVideo(self):  #获取网上视频的界面
+        try:
+            t = video_main(self.conf)
+            t.getVideoUi.exec_()
+
         except Exception as e:
             print(e)
 

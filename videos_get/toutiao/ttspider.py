@@ -55,11 +55,16 @@ class ttspider(QThread):
         except Exception as e:
             print(e)
     def processData(self):
-        print(len(self.rett))
+        #print(len(self.rett))
+        try:
+            abstract=d['abstract']
+        except Exception as e:
+            abstract = ''
         for d in self.rett:
             ret1 = {
+                'source':'今日头条',
                 'title':d['title'],
-                'abstract':d['abstract'],
+                'abstract':abstract,
                 'media_url':self.mainurl + d['media_url'],
                 'source_url':self.mainurl + d['source_url'],
                 'video_play_count':d['video_play_count'],
