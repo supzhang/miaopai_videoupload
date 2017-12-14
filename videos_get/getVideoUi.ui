@@ -1,0 +1,354 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>getVideoUi</class>
+ <widget class="QDialog" name="getVideoUi">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>833</width>
+    <height>654</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>网上视频收集下载器</string>
+  </property>
+  <widget class="QGroupBox" name="videoCat">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>70</y>
+     <width>881</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>视频分类</string>
+   </property>
+   <widget class="QCheckBox" name="yule">
+    <property name="geometry">
+     <rect>
+      <x>60</x>
+      <y>20</y>
+      <width>51</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>娱乐</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="yingshi">
+    <property name="geometry">
+     <rect>
+      <x>110</x>
+      <y>20</y>
+      <width>51</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>影视</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="shenghuo">
+    <property name="geometry">
+     <rect>
+      <x>160</x>
+      <y>20</y>
+      <width>51</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>生活</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="youxi">
+    <property name="geometry">
+     <rect>
+      <x>210</x>
+      <y>20</y>
+      <width>51</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>游戏</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="shehui">
+    <property name="geometry">
+     <rect>
+      <x>260</x>
+      <y>20</y>
+      <width>51</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>社会</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="yinyue">
+    <property name="geometry">
+     <rect>
+      <x>310</x>
+      <y>20</y>
+      <width>51</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>音乐</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="tuijian">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>20</y>
+      <width>51</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>推荐</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="yule_2">
+    <property name="geometry">
+     <rect>
+      <x>450</x>
+      <y>40</y>
+      <width>51</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>娱乐</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="kaiyan">
+    <property name="geometry">
+     <rect>
+      <x>410</x>
+      <y>20</y>
+      <width>51</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>开眼</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="gaoxiao">
+    <property name="geometry">
+     <rect>
+      <x>360</x>
+      <y>20</y>
+      <width>51</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>搞笑</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="kaiyan_2">
+    <property name="geometry">
+     <rect>
+      <x>490</x>
+      <y>40</y>
+      <width>51</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>开眼</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="daimeng">
+    <property name="geometry">
+     <rect>
+      <x>460</x>
+      <y>20</y>
+      <width>51</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>呆盟</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="xiangsheng">
+    <property name="geometry">
+     <rect>
+      <x>510</x>
+      <y>20</y>
+      <width>71</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>相声小品</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="videSource">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>10</y>
+     <width>881</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>视频来源</string>
+   </property>
+   <widget class="QCheckBox" name="check_toutiao">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>20</y>
+      <width>71</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>今日头条</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="haokan">
+    <property name="geometry">
+     <rect>
+      <x>80</x>
+      <y>20</y>
+      <width>71</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>好看视频</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QPushButton" name="btn_getvideo">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>130</y>
+     <width>75</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>获取视频</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btn_download">
+   <property name="geometry">
+    <rect>
+     <x>80</x>
+     <y>130</y>
+     <width>91</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>下载选中视频</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="line_videoSave">
+   <property name="geometry">
+    <rect>
+     <x>410</x>
+     <y>130</y>
+     <width>381</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+   <property name="placeholderText">
+    <string extracomment="可在右方选择视频存放位置"/>
+   </property>
+  </widget>
+  <widget class="QLabel" name="lab_videoPosition">
+   <property name="geometry">
+    <rect>
+     <x>320</x>
+     <y>130</y>
+     <width>81</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>视频下载位置：</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btn_selectSavePath">
+   <property name="geometry">
+    <rect>
+     <x>800</x>
+     <y>130</y>
+     <width>31</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>../image/ico/Arzo_Icons_018.png</normaloff>../image/ico/Arzo_Icons_018.png</iconset>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>16</width>
+     <height>16</height>
+    </size>
+   </property>
+  </widget>
+  <widget class="QTableWidget" name="table_videos">
+   <property name="geometry">
+    <rect>
+     <x>-5</x>
+     <y>161</y>
+     <width>841</width>
+     <height>491</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btn_delsel">
+   <property name="geometry">
+    <rect>
+     <x>180</x>
+     <y>130</y>
+     <width>71</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>删除未选中</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btn_delall">
+   <property name="geometry">
+    <rect>
+     <x>260</x>
+     <y>130</y>
+     <width>61</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string> 清空</string>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
