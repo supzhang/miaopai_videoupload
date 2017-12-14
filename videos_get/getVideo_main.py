@@ -2,8 +2,9 @@ from videos_get.Ui_getVideoUi import Ui_getVideoUi
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QTableWidgetItem,QFileDialog
-from PyQt5.QtCore import pyqtSignal,Qt
+from PyQt5.QtCore import pyqtSignal,Qt,QTimer
 from videos_get.toutiao.ttspider import ttspider
+from videos_get.toutiao.hkspider import hkspider
 from videos_get.downloadThread import download
 from multiprocessing import Queue
 import webbrowser
@@ -18,11 +19,14 @@ class video_main(Ui_getVideoUi):
         self.setupUi(self.getVideoUi)
         self.getVideoUi.show()
         self.conf = conf
-        self.getVideoUi.setWindowTitle('热门视频下载器from zzy,' + conf['version'])
+        self.getVideoUi.setWindowTitle('热门视频下载器from zzy,' + conf['version'] + '请勿短时间内太多请求！')
         pixmap = QPixmap(r'image/ico_down.png')
         titleIco = QIcon(pixmap)
         self.getVideoUi.setWindowIcon(titleIco)
-
+        ############计时器
+        self.timer = QTimer()
+        self.timer.setInterval(1000)
+        #self.timer.timeout.connect(self.changeBtn)
         self.table_videos.setColumnCount(7)
         self.table_videos.setHorizontalHeaderLabels(['选择','来源','下载','标题','浏览量','下载地址','check'])
         self.table_videos.setColumnWidth(0,20)
@@ -62,19 +66,43 @@ class video_main(Ui_getVideoUi):
                       'yule': 'subv_entertainment',
                       'yingshi': 'subv_movie',
                       'shenghuo': 'subv_life',
-                      'xiaopin': 'subv_comedy',
+                      'xiangsheng': 'subv_comedy',
                       'shehui': 'subv_society',
                       }
+        self.hkCats = {
+                    'tuijian': 'reommmend',
+                    'gaoxiao': 'qiongying',
+                    'yinyue': 'yinyuetai',
+                    'shehui':'news',
+                    'yule': 'zuiyule',
+                    'shenghuo':'aishenghuo',
+                    'xiangsheng': 'xiaopin',
+                    'youxi': 'youxi',
+                    'junshi': 'military',
+                    'kaiyan': 'waiguoren',
+                    'jiaoyu': 'edu',
+                    'daimeng': 'mengmengda',
+                    'keji': 'tech',
+                    'tiyu': 'tiyu',
+                    'dongman': 'dongman',
+                    'guangchangwu': 'guangchangwu',
+        }
 
 
     def getVideo(self): #获取视频信息
 
         cats = self.getCheckCat()
+        self.waitTime = 5
+        self.timer.start(1000)
+
         self.threads = []
-        for cat in cats:
-            self.t1 = ttspider(cat,10)
-            self.t1.finalInfo.connect(self.addrows)
-            self.threads.append(self.t1)
+        sourceDict = {'toutiao':ttspider,
+                      'haokan':hkspider}
+        for source in cats[0]:
+             for cat in cats[1]:
+                self.t1 = sourceDict[source](cat,10)
+                self.t1.finalInfo.connect(self.addrows)
+                self.threads.append(self.t1)
         for thread in self.threads:
             thread.start()
 
@@ -91,22 +119,41 @@ class video_main(Ui_getVideoUi):
 
     def getCheckCat(self):
         checkedCat = []
-        if self.check_toutiao.isChecked():
-            checkedCat.append(self.categories['tuijian']) if self.tuijian.isChecked() else ''
-            checkedCat.append(self.categories['yule']) if self.yule.isChecked() else ''
-            checkedCat.append(self.categories['shenghuo']) if self.shenghuo.isChecked() else ''
-            checkedCat.append(self.categories['yingshi']) if self.yingshi.isChecked() else ''
-            checkedCat.append(self.categories['youxi']) if self.youxi.isChecked() else ''
-            checkedCat.append(self.categories['yinyue']) if self.yinyue.isChecked() else ''
-            checkedCat.append(self.categories['kaiyan']) if self.kaiyan.isChecked() else ''
-            checkedCat.append(self.categories['shehui']) if self.shehui.isChecked() else ''
-            print(checkedCat)
+        checkedSource = []
+        checkedCat.append(self.categories['tuijian']) if self.tuijian.isChecked() else ''
+        checkedCat.append(self.categories['yule']) if self.yule.isChecked() else ''
+        checkedCat.append(self.categories['shenghuo']) if self.shenghuo.isChecked() else ''
+        checkedCat.append(self.categories['yingshi']) if self.yingshi.isChecked() else ''
+        checkedCat.append(self.categories['youxi']) if self.youxi.isChecked() else ''
+        checkedCat.append(self.categories['yinyue']) if self.yinyue.isChecked() else ''
+        checkedCat.append(self.categories['kaiyan']) if self.kaiyan.isChecked() else ''
+        checkedCat.append(self.categories['shehui']) if self.shehui.isChecked() else ''
+        checkedCat.append(self.categories['xiangsheng']) if self.xiangsheng.isChecked() else ''
+        checkedCat.append(self.categories['gaoxiao']) if self.gaoxiao.isChecked() else ''
+        checkedCat.append(self.categories['daimeng']) if self.daimeng.isChecked() else ''
+        #print(checkedCat)
         if len(checkedCat) == 0:
             try:
-                QtWidgets.QMessageBox.information(self.getVideoUi,'提醒','请先选择来源及分类')
+                QtWidgets.QMessageBox.information(self.getVideoUi,'提醒','请先选择分类')
+                return []
             except Exception as e :
                 print(e)
-        return checkedCat
+        try:
+            if self.check_toutiao.isChecked():
+
+                checkedSource.append('toutiao')
+            if self.haokan.isChecked():
+                checkedSource.append('haokan')
+            if len(checkedSource) == 0:
+
+                QtWidgets.QMessageBox.information(self.getVideoUi, '提醒', '请先选择视频来源')
+                return []
+            if len(checkedSource) * len(checkedCat) > 6:
+                QtWidgets.QMessageBox.information(self.getVideoUi, '提醒', '请勿选择过多的视频来源或视频分类')
+                return []
+        except Exception as e:
+            print(e)
+        return [checkedSource,checkedCat]
     def addrows(self,row):
         #print('---------',row)
         row['rowid'] = self.rowid  #此记录的唯一标识
@@ -217,6 +264,11 @@ class video_main(Ui_getVideoUi):
                     self.table_videos.removeRow(row)
         except Exception as e:
             print(e)
+    def changeBtn(self):
+        print(self.waitTime)
+        self.btn_getvideo.setText(self.waitTime)# + ' 获取视频')
+        self.waitTime -+ 1
+        #self.btn_getvideo.setDisabled(True)
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     ui = video_main()

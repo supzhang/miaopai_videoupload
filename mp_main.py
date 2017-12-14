@@ -22,7 +22,7 @@ class myui(form):
     def __init__(self):
         super().__init__()
         ####################检测新版本########################
-        version = '20171213'   #本软件版本
+        version = '20171214'   #本软件版本
         self.setWindowTitle('秒拍视频上传工具 ' + version + '  FROM zzy Q:1728570648 仅供测试，勿用于非法活动！')
         u = update(version)
         u.hasNewVersion.connect(self.hasNewVer)  # [是否有新版本,版本名,版本路径]

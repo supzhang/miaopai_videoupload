@@ -71,10 +71,12 @@ class ttspider(QThread):
                 'publish_time':d['behot_time'],
                 'avatar_url':d['image_url'],
                 'video_id':d['video_id'],
+                'time_period':0,
             }
             try:
                 final = self.get_video_url(ret1)
                 self.ret = final
+                print(final)
                 self.finalInfo.emit(final)
                # print('aaaaaaaaaa',final)
 
