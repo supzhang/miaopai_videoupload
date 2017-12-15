@@ -112,9 +112,9 @@ class ttspider(QThread):
         return val >> n if val >= 0 else (val + 0x100000000) >> n
 
 
-t = ttspider('subv_funny',20)
-t.start()
-t.exec()
+# t = ttspider('subv_funny',20)
+# t.start()
+# t.exec()
 
 
 
