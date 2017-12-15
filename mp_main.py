@@ -78,8 +78,6 @@ class myui(form):
             'Referer':'http://creator.miaopai.com/login',
             'Accept-Language': 'zh-CN,zh;q=0.8',
         }
-        # self.txt_user.setText('15966318237')
-        # self.txt_pass.setText('caolei2121')
         self.readHelp()  #读取帮助文件
         self.isLogin = False
 

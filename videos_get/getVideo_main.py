@@ -92,6 +92,8 @@ class video_main(Ui_getVideoUi):
     def getVideo(self): #获取视频信息
 
         cats = self.getCheckCat()
+        if len(cats) == 0:
+            return
         self.waitTime = 5
         self.timer.start(1000)
 
@@ -148,14 +150,16 @@ class video_main(Ui_getVideoUi):
 
                 QtWidgets.QMessageBox.information(self.getVideoUi, '提醒', '请先选择视频来源')
                 return []
+
             if len(checkedSource) * len(checkedCat) > 6:
                 QtWidgets.QMessageBox.information(self.getVideoUi, '提醒', '请勿选择过多的视频来源或视频分类')
                 return []
+
         except Exception as e:
             print(e)
         return [checkedSource,checkedCat]
     def addrows(self,row):
-        #print('---------',row)
+        #print('---------',row)'http://v9-tt.ixigua.com/53
         row['rowid'] = self.rowid  #此记录的唯一标识
         self.rowsinfo.append(row)
         colno = 1

@@ -100,7 +100,7 @@ class ttspider(QThread):
             print('获取视频真实地址：',e)
         return info
     def get_url_real_url(self,url):   #获取真实视频地址
-
+        print('-----------------------',url)
         res = requests.get(url,headers = self.headers,verify = False)
         url_json = res.json()
         videolist = url_json['data']['video_list']
